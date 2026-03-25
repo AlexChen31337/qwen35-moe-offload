@@ -17,7 +17,7 @@ from harness import run_benchmark, get_model_path, NVMeTracker
 # ---------------------------------------------------------------------------
 
 CACHE_WINDOW_K = 5            # sliding window size (tokens)
-MAX_CACHED_EXPERTS = 50       # max experts to keep in DRAM cache
+MAX_CACHED_EXPERTS = 40       # max experts to keep in DRAM cache
 PREFETCH_THREADS = 8          # async NVMe prefetch thread count (0 = disabled)
 BUNDLE_MODE = "separate"      # "gate_down" | "gate_up_down" | "separate"
 READ_ALIGN_BYTES = 524288     # NVMe read alignment (512KB — sequential territory)
