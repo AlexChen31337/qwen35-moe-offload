@@ -1,0 +1,13 @@
+models/
+*.gguf
+*.safetensors
+*.bin
+__pycache__/
+*.pyc
+.venv/
+dist/
+*.egg-info/
+results/*.jsonl
+!results/.gitkeep
+experiments/*/
+!experiments/*/.gitkeep
