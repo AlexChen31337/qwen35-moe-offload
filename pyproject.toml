@@ -1,5 +1,5 @@
 [project]
-name = "qwen35-moe-offload"
+name = "qwen35_moe_offload"
 version = "0.1.0"
 description = "Efficient Qwen3.5-35B-A3B inference on RTX 3070 8GB using flash-memory MoE expert offloading"
 requires-python = ">=3.11"
@@ -11,11 +11,15 @@ dependencies = [
     "huggingface-hub>=0.23.0",
     "numpy>=1.26.0",
     "tqdm>=4.66.0",
+    "psutil>=5.9.0",
 ]
 
 [project.optional-dependencies]
 llama = ["llama-cpp-python>=0.2.70"]
 dev = ["pytest>=8.0.0", "matplotlib>=3.8.0"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
 
 [build-system]
 requires = ["hatchling"]
