@@ -16,7 +16,7 @@ from harness import run_benchmark, get_model_path, NVMeTracker
 # EXPERIMENT KNOBS — modify these
 # ---------------------------------------------------------------------------
 
-CACHE_WINDOW_K = 5            # sliding window size (tokens)
+CACHE_WINDOW_K = 10           # sliding window size (tokens)
 MAX_CACHED_EXPERTS = 50       # max experts to keep in DRAM cache
 PREFETCH_THREADS = 4          # async NVMe prefetch thread count (0 = disabled)
 BUNDLE_MODE = "gate_down"     # "gate_down" | "gate_up_down" | "separate"
