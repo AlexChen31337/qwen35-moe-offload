@@ -1,1 +1,54 @@
 commit	tok_per_sec	vram_gb	ram_gb	cache_hit	status	description
+7769d2b	0.761	0.0	0.763	0.000	keep	bundle=separate (3 separate reads, smaller individual reads) - BIG WIN
+e67e523	1.848	0.0	0.686	0.000	keep	cache k=3, no prefetch (PREFETCH_THREADS=0)
+6e1ac35	1.853	0.0	0.763	0.000	keep	cache k=5, prefetch 8 threads
+193801d	0.763	0.0	0.767	0.000	discard	bundle=gate_up_down (3x chunk) — regression
+9538421	1.799	0.0	0.763	0.000	discard	Q5_K_M quantization — slight regression
+dc65d42	1.608	0.0	0.775	0.000	discard	Q8_0 quantization — slower due to larger weights
+3d7857f	1.615	0.0	0.767	0.000	discard	VRAM_CACHE_FRACTION=0.3 — slower
+33b3b00	1.476	0.0	0.767	0.000	discard	VRAM_CACHE_FRACTION=0.5 — worse than 0.3
+c33ee51	1.586	0.0	0.763	0.000	discard	predictor threshold 0.3 (aggressive) — slower
+9d357ee	1.547	0.0	0.763	0.000	discard	predictor threshold 0.7 (conservative) — slower
+1290f20	1.748	0.0	0.767	0.000	discard	predictor disabled (threshold=1.0, pure LRU) — slower
+b678daa	1.515	0.0	0.795	0.000	discard	MAX_CACHED_EXPERTS=200 — slower, more RAM
+43bb0e4	1.562	0.0	0.698	0.000	discard	MAX_CACHED_EXPERTS=20 (minimal) — slower, less RAM
+98bf34b	1.520	0.0	0.770	0.000	discard	prefetch lookahead 2 — slower
+6e22f48	1.494	0.0	0.766	0.000	discard	prefetch lookahead 3 — slower
+2fb926e	1.514	0.0	0.824	0.000	discard	COMBO k=7 + 8 threads + 128KB + separate — slower, more RAM
+7c90adb	1.514	0.0	0.959	0.000	discard	COMBO k=10+200cached+8threads+separate+Q5_K_M — slower, high RAM
+4e25875	1.497	0.0	0.770	0.000	discard	COMBO VRAM 0.3 + k=5 + 8 threads + lookahead 2 — slower
+5825f84	1.489	0.0	0.766	0.000	discard	COMBO best + Q8_0 — slower
+bef362f	1.494	0.0	0.698	0.000	discard	COMBO minimal (k=3, cached=20, prefetch=0) — floor, low RAM
+c11a555	1.520	0.0	1.391	0.000	discard	COMBO maximal (k=15,cached=300,prefetch=16,lookahead=3) — overshoot, huge RAM
+3a40a8b	1.488	0.0	0.694	0.000	discard	CREATIVE k=3 + 8 prefetch — worse than either alone
+a10277e	1.470	0.0	0.653	0.000	discard	CREATIVE k=2 (too aggressive eviction)
+cafdf8e	1.490	0.0	0.623	0.000	discard	CREATIVE k=1 (no window eviction) — lowest RAM
+de6f398	1.493	0.0	0.732	0.000	discard	CREATIVE k=4 — no improvement
+de1ef5f	1.427	0.0	0.770	0.000	discard	CREATIVE prefetch 12 threads — diminishing returns
+e066518	1.516	0.0	0.765	0.000	discard	CREATIVE read align 256KB — slight regression
+d8ad3b8	2.262	0.0	0.763	0.000	keep	CREATIVE read align 512KB — HUGE WIN, near-sequential NVMe
+9d1a0c0	2.252	0.0	0.763	0.000	discard	CREATIVE read align 1MB — no gain over 512KB
+3d7f9cb	2.199	0.0	0.766	0.000	discard	CREATIVE read align 2MB — slightly worse than 512KB
+811bf7b	2.212	0.0	0.691	0.000	discard	CREATIVE k=3+noprefetch+512KB — close but under 2.262
+8105cf5	2.257	0.0	0.766	0.000	discard	CREATIVE k=5+4prefetch+512KB — tied, not better
+d5a2c82	2.259	0.0	0.754	0.000	discard	CREATIVE cached=30+512KB — no improvement
+78aa337	2.233	0.0	0.808	0.000	discard	CREATIVE k=6+512KB — slight regression
+161fcab	1.768	0.0	0.766	0.000	discard	CREATIVE predictor 0.4+512KB — regression
+8d922ce	2.116	0.0	0.766	0.000	discard	CREATIVE cached=100+512KB — slower
+e882985	2.747	0.0	0.787	0.000	keep	CREATIVE cached=40+512KB — HUGE WIN, new best!
+fd13118	2.648	0.0	0.724	0.000	discard	CREATIVE cached=35+512KB — close but under 2.747
+8f578d7	2.716	0.0	0.766	0.000	discard	CREATIVE cached=45+512KB — close but under 2.747
+1fbd7ac	2.680	0.0	0.687	0.000	discard	CREATIVE k=3+cached=40+noprefetch+512KB — under 2.747
+0130f79	2.745	0.0	0.779	0.000	discard	CREATIVE prefetch=6+cached=40+512KB — tied, not better
+cab93f9	2.744	0.0	0.787	0.000	discard	CREATIVE cached=40+512KB+predictor disabled — tied
+6c4c476	1.857	0.0	0.787	0.000	discard	CREATIVE cached=40+384KB — below 512KB cliff
+1f06085	2.783	0.0	0.728	0.000	keep	CREATIVE k=4+cached=40+512KB — NEW BEST!
+97d978e	2.695	0.0	0.691	0.000	discard	CREATIVE k=3+cached=40+512KB — under k=4
+6621644	2.711	0.0	0.725	0.000	discard	CREATIVE k=4+cached=40+512KB+noprefetch — 8 threads better
+c0cdc4e	2.708	0.0	0.725	0.000	discard	CREATIVE k=4+cached=38+512KB — 40 confirmed optimal
+bef5f9b	2.699	0.0	0.728	0.000	discard	CREATIVE k=4+cached=42+512KB — 40 is optimal
+a5b193e	2.698	0.0	0.725	0.000	discard	CREATIVE k=4+cached=40+512KB+prefetch10 — 8 threads optimal
+ed094e8	1.745	0.0	0.728	0.000	discard	CREATIVE k=4+cached=40+512KB+gate_down — separate is far better
+03ef479	2.708	0.0	0.728	0.000	discard	CREATIVE k=4+cached=40+768KB — 512KB is fine
+50114e8	2.712	0.0	0.725	0.000	discard	CREATIVE k=4+cached=36+512KB — 40 confirmed optimal
+b1b5dff	2.708	0.0	0.725	0.000	discard	CREATIVE predictor=0.6 — 0.5 is optimal
