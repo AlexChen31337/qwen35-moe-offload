@@ -125,3 +125,24 @@ Start with these, then improvise:
 16. Increase DRAM cache to 200 experts max
 17. Prefetch lookahead depth 2 (predict 2 tokens ahead)
 18. Combine k=7 + 8 threads + 128KB alignment + bundle gate+down
+
+---
+
+## Phase 4 — KV Cache Compression (Active Goal)
+
+**Current best:** 6.587 tok/s (exp 15, n_ubatch=32)  
+**Phase 3 conclusion:** Parameter tuning exhausted — llama.cpp knobs maxed out at ~6.6 tok/s.
+
+**New axis: KV cache compression.** The KV cache is the second VRAM bottleneck after expert weights. Compressing it unlocks longer context AND potentially faster throughput.
+
+**Direction:**
+1. Start with llama.cpp built-in KV quant flags — `--cache-type-k` / `--cache-type-v` (q8_0, q4_0, q4_1) — measure tok/s and VRAM at n_ctx=512, then push n_ctx up (1024, 2048, 4096) if VRAM allows
+2. Find the optimal KV quant level where accuracy holds but VRAM drops meaningfully
+3. Inspired by TurboQuant (arXiv:2504.19874, ICLR 2026): zero-overhead KV compression via PolarQuant rotation + 1-bit QJL residual — explore whether a Python wrapper around llama.cpp can inject this
+
+**Target:**
+- ≥ 8 tok/s at n_ctx=512
+- OR ≥ 6 tok/s at n_ctx=4096 (useful context length)
+- VRAM budget: ≤ 7.5GB peak
+
+**Rule:** Same as always — no constraints on what to try. Data drives decisions. If KV quant degrades quality measurably (outputs become incoherent), back off. If it's free or nearly free, push hard.
