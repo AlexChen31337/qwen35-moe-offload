@@ -19,7 +19,7 @@ MODEL_PATH = "./models/Qwen3.5-35B-A3B-Q3_K_M.gguf"
 N_GPU_LAYERS = 10
 N_CTX = 512
 N_THREADS = 10
-N_BATCH = 64
+N_BATCH = 32
 N_UBATCH = 32
 
 # KV cache quantization types (GGML integer constants)
