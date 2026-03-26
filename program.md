@@ -156,20 +156,34 @@ When one axis is exhausted, stack the next: KV quant → GPU layers → context 
 - At n_ctx=4096: catastrophic overhead per step
 - QJL's 65× speed advantage over PolarQuant Python is pure overhead, not math
 
-**The right approach — Rust + CUDA:**
-1. `crates/polarquant/` — Rust crate, safe buffer management via borrow checker
-2. Hadamard preconditioner → CUDA kernel via `cudarc` (Hugging Face's safe CUDA bindings)
-3. Angle quantization → pack into ggml-compatible tensor layout
-4. FFI bridge → C API via `#[no_mangle] extern "C"` exports, bindgen for llama.cpp headers
-5. Wire into llama.cpp as `--cache-type-k polar_q4` (same pattern as q8_0/q4_0)
+**Two parallel tracks — both in Rust + CUDA:**
+
+### Track A: PolarQuant (arXiv:2502.02617)
+- `crates/polarquant/` — Rust crate
+- Hadamard preconditioner → CUDA kernel via `cudarc`
+- Angle quantization → ggml-compatible tensor layout
+- Wire as `--cache-type-k polar_q4`
+- **Advantage:** 3.91× compression, highest quality (0.89 cosine sim)
+
+### Track B: QJL (arXiv:2406.03482)
+- `crates/qjl/` — Rust wrapper around existing CUDA kernels (github.com/amirzandieh/QJL)
+- JL transform + sign-bit quantization → already proven CUDA implementation
+- Wire as `--cache-type-k qjl_3bit`
+- **Advantage:** CUDA kernel already exists, 65× faster than Python PolarQuant, 5× compression at 3-bit
+
+### Why both:
+- QJL ships faster (CUDA already written, wrap in Rust + FFI to llama.cpp)
+- PolarQuant achieves higher quality at comparable compression
+- Run both, let the autoresearch loop find which wins on real inference throughput
+- Same author (Amir Zandieh) — codebases share design patterns
 
 **Why Rust over C/C++:**
-- Borrow checker prevents use-after-free in KV cache lifecycle (silent corruption in C++)
+- Borrow checker prevents use-after-free in KV cache lifecycle
 - Zero-cost abstractions — same machine code as C for inner loops
-- `cudarc` crate for safe CUDA kernel dispatch
-- Aligns with ClawChain/EvoClaw ecosystem (Rust-native stack)
-- Others can use it as a crate without unsafe memory hazards
+- `cudarc` for safe CUDA dispatch
+- Aligns with ClawChain/EvoClaw Rust-native stack
+- Publishable as standalone crates
 
 **Reference:** llama.cpp `src/llama-kv-cache.cpp` + `ggml/src/ggml-cuda/quantize.cu` for integration points.
 
-**Goal:** PolarQuant Rust/CUDA should match or exceed q4_0 throughput with 3.91× compression (vs q4_0's ~2×).
+**Goal:** whichever wins the autoresearch benchmark becomes the default KV backend. No pre-declared winner — data decides.
