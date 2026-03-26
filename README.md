@@ -93,24 +93,43 @@ goal (program.md) → agent decides → modify bench_kv.py → run 256 tokens �
 - `phase3/real-inference` — Real GGUF on RTX 3070 (15 experiments, best: 6.59 tok/s)
 - `phase4/kv-compression` — KV cache compression (ongoing, best: **10.20 tok/s**)
 
+## Roadmap
+
+| Phase | Technique | Status | Best result |
+|-------|-----------|--------|-------------|
+| 3 | llama.cpp parameter tuning | ✅ Done | 6.59 tok/s |
+| 4 | KV block quant (q8_0) + flash attn + GPU layers | ✅ Done | **10.20 tok/s** |
+| 5A | PolarQuant Rust+CUDA (arXiv:2502.02617) | 🔨 Building | — |
+| 5B | QJL Rust+CUDA (arXiv:2406.03482) | 🔨 Building | — |
+| 6 | Async expert prefetch (Apple §3.1) | 📋 Planned | — |
+
+No ceiling. No predicted targets. The autoresearch loop runs until hardware limits are found empirically.
+
 ## Repo Structure
 
 ```
 .
 ├── README.md
 ├── PLAN.md                     # Detailed implementation plan
-├── program.md                  # Autoresearch goal and current phase
+├── program.md                  # Autoresearch goal and current phase directive
 ├── harness.py                  # Fixed benchmark harness (immutable)
-├── bench.py                    # Autoresearch editable file (NVMe/RAM phases)
+├── bench.py                    # Autoresearch editable (NVMe/RAM phases)
 ├── bench_kv.py                 # KV compression experiments (Phase 4)
+├── bench_polarquant.py         # PolarQuant benchmark (Phase 5A)
+├── bench_qjl.py                # QJL benchmark (Phase 5B)
 ├── docs/
 │   ├── architecture.md         # Qwen3.5-35B-A3B architecture breakdown
 │   ├── apple-flash-mapping.md  # Apple paper techniques → MoE expert mapping
+│   ├── kv-compression.md       # KV cache compression: PolarQuant + QJL deep dive
 │   └── hardware-profile.md     # RTX 3070 + NVMe bandwidth measurements
-└── scripts/
-    ├── measure_nvme.py          # Benchmark NVMe sequential vs random read
-    ├── expert_cache.py          # Sliding window expert DRAM cache
-    └── download_model.py        # Download Qwen3.5-35B-A3B-Q3_K_M GGUF
+├── scripts/
+│   ├── polar_kv.py             # PolarQuant Python prototype (correctness verified)
+│   ├── measure_nvme.py         # Benchmark NVMe sequential vs random read
+│   ├── expert_cache.py         # Sliding window expert DRAM cache
+│   └── download_model.py       # Download Qwen3.5-35B-A3B-Q3_K_M GGUF
+└── crates/                     # Phase 5 — Rust+CUDA implementations (in progress)
+    ├── polarquant/             # PolarQuant: Hadamard+polar decomposition CUDA kernel
+    └── qjl/                    # QJL: JL transform + sign-bit quantization CUDA wrapper
 ```
 
 ## Quick Start
