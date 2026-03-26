@@ -17,7 +17,7 @@ Usage: uv run python bench.py > run.log 2>&1
 """
 import os, time, random, threading
 from pathlib import Path
-from collections import OrderedDict
+from collections import OrderedDict, deque
 from concurrent.futures import ThreadPoolExecutor
 import torch
 
@@ -45,10 +45,8 @@ PREFETCH_WORKERS = 2           # threads loading next-token experts in backgroun
 # --- Expert cache (shared between backends) ---
 CACHE_WINDOW_K = 4             # sliding window size
 MAX_CACHED_EXPERTS = 40        # keep top-40 in pinned GPU buffer -- EXP16 best combo
-VRAM_PINNED_EXPERTS = 10240    # EXP24: cache ALL experts in VRAM (256 × 40 = 10240)
-                               # This pins every expert from every layer
+VRAM_PINNED_EXPERTS = 10240    # keep at 10240 — caches all 256×40 experts
                                # After warmup: 100% VRAM hit rate → zero transfer cost
-                               # Only RAM hits for first 10240 loads
 
 # --- NVMe backend config (baseline comparison) ---
 READ_ALIGN_BYTES = 524288      # 512KB — from best NVMe config
@@ -78,8 +76,8 @@ class RAMExpertStoreBatched:
         # Use set for O(1) membership check (no lock needed, single-threaded)
         self._vram_set: set = set()
         self._ram_set: set = set()
-        self._vram_order: list = []            # FIFO eviction (approximates LRU)
-        self._ram_order: list = []
+        self._vram_order: deque = deque()      # O(1) popleft eviction
+        self._ram_order: deque = deque()
         self._hits_vram = 0
         self._hits_ram = 0
         self._misses = 0
@@ -89,7 +87,8 @@ class RAMExpertStoreBatched:
 
     def load_all_layers(self, layer_experts: list[tuple[int, list[int]]]) -> None:
         """
-        Load all layers' experts in ONE pass — no lock, no dict, pure set ops.
+        Load all layers' experts in ONE pass — no lock, deque eviction, pure set ops.
+        EXP25: deque popleft is O(1) vs list.pop(0) O(n).
         layer_experts: list of (layer_idx, [expert_ids])
         """
         ram_hits = 0
@@ -99,6 +98,7 @@ class RAMExpertStoreBatched:
         vram_order = self._vram_order
         ram_order = self._ram_order
         vram_limit = VRAM_PINNED_EXPERTS
+        ram_limit = 10240  # total experts = 256*40
 
         for layer_idx, expert_ids in layer_experts:
             for eid in expert_ids:
@@ -110,23 +110,20 @@ class RAMExpertStoreBatched:
                     ram_hits += 1
                     # Promote to VRAM
                     if len(vram_set) >= vram_limit:
-                        evict = vram_order.pop(0)
-                        vram_set.discard(evict)
+                        vram_set.discard(vram_order.popleft())
                     vram_set.add(key)
                     vram_order.append(key)
                 else:
                     self._misses += 1
                     cold_loads += 1
                     # Add to RAM
-                    if len(ram_set) > 10000:
-                        evict = ram_order.pop(0)
-                        ram_set.discard(evict)
+                    if len(ram_set) >= ram_limit:
+                        ram_set.discard(ram_order.popleft())
                     ram_set.add(key)
                     ram_order.append(key)
                     # Also promote to VRAM
                     if len(vram_set) >= vram_limit:
-                        evict = vram_order.pop(0)
-                        vram_set.discard(evict)
+                        vram_set.discard(vram_order.popleft())
                     vram_set.add(key)
                     vram_order.append(key)
 
