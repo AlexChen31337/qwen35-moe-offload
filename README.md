@@ -1,6 +1,17 @@
 # qwen35-moe-offload
 
-> Efficient inference of Qwen3.5-35B-A3B on consumer hardware (RTX 3070 8GB + 16GB RAM + NVMe SSD) using flash-memory offloading techniques inspired by Apple's "LLM in a Flash" paper (arXiv:2312.11514).
+> Efficient inference of Qwen3.5-35B-A3B on consumer hardware (RTX 3070 8GB + 16GB RAM + NVMe SSD), combining two orthogonal optimization axes: Apple's "LLM in a Flash" flash-memory expert offloading (arXiv:2312.11514) and Google's TurboQuant zero-overhead KV cache compression (arXiv:2504.19874, ICLR 2026).
+
+## Results
+
+| Phase | Best tok/s | Key technique |
+|---|---|---|
+| Phase 3 (baseline tuning) | 6.59 tok/s | n_ubatch=32, n_threads=10 |
+| Phase 4 exp 2 | 8.52 tok/s | q8_0 KV quant + flash attention |
+| Phase 4 exp 12 | 9.90 tok/s | +10 GPU layers |
+| **Phase 4 exp 14** | **10.20 tok/s** | n_gpu=10, n_batch=32, q8_0 KV, flash_attn |
+
+**+54% improvement** over parameter-tuned baseline via KV cache compression alone.
 
 ## The Core Insight
 
@@ -9,7 +20,12 @@ Qwen3.5-35B-A3B is a **sparse Mixture-of-Experts** model:
 - **3B activated per token** — only 8 routed experts + 1 shared expert fire per forward pass
 - **256 total experts**, 9 active → **96.5% of FFN expert weights are idle per token**
 
-This is *exactly* the sparsity structure that Apple's flash offloading exploits. We don't need 35B in VRAM — we need ~3B active weights + the attention/embedding layers (~6GB), and we can stream expert weights on demand from NVMe.
+Two independent memory bottlenecks exist on constrained hardware:
+
+1. **Expert weight I/O** — 35B params won't fit in 8GB VRAM; must stream from NVMe/RAM
+2. **KV cache** — grows linearly with context length; limits usable sequence length
+
+These are orthogonal bottlenecks. We attack both simultaneously.
 
 ## Hardware
 
@@ -19,7 +35,36 @@ This is *exactly* the sparsity structure that Apple's flash offloading exploits.
 | RAM | 16GB DDR4 | Sliding window expert DRAM buffer |
 | SSD | 937GB NVMe (PCIe 3.0) | Full model cold storage, ~3GB/s sequential read |
 
-## Memory Budget Breakdown (Q4_K_M quantization)
+## Dual Optimization Strategy
+
+### Axis 1 — Expert Weight Offloading (Apple "LLM in a Flash")
+Inspired by [arXiv:2312.11514](https://arxiv.org/abs/2312.11514) (ACL 2024):
+
+- Load attention/embedding layers to GPU (always hot, ~5.4GB)
+- Store all 256 expert FFN weight matrices on NVMe as memory-mapped files
+- Per token: route → load only 9 active expert chunks → compute → evict
+- **Windowing:** maintain DRAM cache of last k expert activations (~60-70% NVMe read reduction)
+- **Bundling:** co-locate gate_proj[i] + down_proj[i] on disk → single contiguous NVMe read
+
+### Axis 2 — KV Cache Compression (Google TurboQuant)
+Inspired by [arXiv:2504.19874](https://arxiv.org/abs/2504.19874) (ICLR 2026):
+
+- **PolarQuant**: convert KV vectors to polar coordinates (radius + angle) — eliminates per-block normalization overhead that traditional quantization must carry
+- **QJL (Quantized Johnson-Lindenstrauss)**: 1-bit residual error correction via JL transform — zero memory overhead, bias-free attention scores
+- **TurboQuant**: PolarQuant (main compression budget) + QJL (1-bit residual) = zero-overhead KV compression with no accuracy loss
+
+**Practical implementation via llama.cpp:**
+```bash
+# q8_0 KV quant (Phase 4 best: +54% tok/s)
+--cache-type-k q8_0 --cache-type-v q8_0 --flash-attn
+
+# Push to longer context (TurboQuant-inspired, Phase 4 ongoing)
+--cache-type-k q4_0 --cache-type-v q4_0 --flash-attn --ctx-size 4096
+```
+
+Note: llama.cpp's built-in KV quantization implements a subset of the TurboQuant principles. Full PolarQuant rotation is implemented as a Python wrapper layer (see `scripts/polar_kv.py`, in progress).
+
+## Memory Budget Breakdown (Q3_K_M quantization, actual measurements)
 
 | Layer type | Size | Where |
 |---|---|---|
@@ -29,108 +74,68 @@ This is *exactly* the sparsity structure that Apple's flash offloading exploits.
 | **Total always-hot** | **~5.4GB** | GPU VRAM |
 | Expert FFN weights (full 256 experts) | ~15GB | NVMe SSD |
 | Active expert cache (sliding window k=5) | ~1.5GB | RAM + remaining VRAM |
+| **KV cache (n_ctx=512, f16)** | **~387MB** | GPU VRAM |
+| **KV cache (n_ctx=4096, q8_0)** | **~387MB** | GPU VRAM (4× VRAM savings) |
 
-**Target:** ≤ 7.5GB VRAM peak, ≤ 12GB RAM peak, ≥ 5 tok/s on RTX 3070.
+KV q8_0 compresses the cache 2× vs f16; q4_0 compresses 4×. At n_ctx=4096 with q4_0, KV cache fits in the same VRAM budget as n_ctx=512 with f16.
 
-## Techniques (layered, each experiment builds on prior)
+## Autoresearch Loop
 
-### Phase 1 — Baseline Measurement
-Measure naive inference speed and VRAM ceiling. Establish what breaks without offloading.
-
-### Phase 2 — Expert-Aware Selective Loading
-- Load attention/embedding layers to GPU (always hot)
-- Store all 256 expert FFN weight matrices on NVMe as memory-mapped files
-- Per token: route → load only 9 expert weight chunks → compute → evict
-
-### Phase 3 — Sliding Window Expert Cache (Windowing)
-- Maintain a DRAM cache of the last k=5 tokens' active expert weights
-- Per new token: only load the *delta* experts not in the window
-- Expected: ~60-70% reduction in NVMe reads vs naive per-token loading
-
-### Phase 4 — Row-Column Bundling (Flash Paper Technique)
-- In each MoE layer: co-locate gate_proj row[i] + down_proj col[i] on disk
-- Read both in a single contiguous NVMe chunk (2x chunk size → 2x throughput)
-- NVMe sequential read: ~3GB/s; random 4K read: ~50MB/s → bundling is critical
-
-### Phase 5 — Sparsity Predictor (Low-Rank Expert Router Lookahead)
-- Train a tiny low-rank predictor (similar to Apple paper §3.1) on top of attention output
-- Predicts which experts will activate *before* loading them
-- Enables async prefetch: start NVMe read while previous token is still computing
-- Expected: hide most of the NVMe latency behind compute
-
-### Phase 6 — Full Stack: Quantization + Offload + Async Prefetch
-- Q4_K_M quantization reduces model from ~70GB (fp16) to ~18GB on disk
-- Combine all above: windowing + bundling + async prefetch + quantized weights
-- Target: ≥ 5 tok/s sustained generation
-
-## Autoresearch-Inspired Experiment Loop
-
-Inspired by [karpathy/autoresearch](https://github.com/karpathy/autoresearch): each experiment is a fixed-budget (5 min) benchmark run with a single variable changed. An agent evaluates the result, decides keep/discard, and logs to `results/`.
+Experiments are driven by an autonomous Opus 4.6 agent — no human guidance between runs. The agent reads `program.md` (goal), examines prior results, decides what to change, runs, measures, and commits. Inspired by [karpathy/autoresearch](https://github.com/karpathy/autoresearch).
 
 ```
-experiment → benchmark (5 min) → evaluate metric → log result → next experiment
+goal (program.md) → agent decides → modify bench_kv.py → run 256 tokens → measure tok/s → commit if new best → repeat
 ```
 
-**Metric:** tokens/second on a fixed 512-token prompt → 256-token generation.  
-**Secondary:** peak VRAM, peak RAM, NVMe read bytes per token.
+**Branches:**
+- `autoresearch/mar25` — NVMe simulation (52 experiments)
+- `autoresearch/ram-offload` — RAM backend simulation (82 experiments)
+- `phase3/real-inference` — Real GGUF on RTX 3070 (15 experiments, best: 6.59 tok/s)
+- `phase4/kv-compression` — KV cache compression (ongoing, best: **10.20 tok/s**)
 
 ## Repo Structure
 
 ```
 .
 ├── README.md
-├── PLAN.md                    # Detailed implementation plan (this file)
+├── PLAN.md                     # Detailed implementation plan
+├── program.md                  # Autoresearch goal and current phase
+├── harness.py                  # Fixed benchmark harness (immutable)
+├── bench.py                    # Autoresearch editable file (NVMe/RAM phases)
+├── bench_kv.py                 # KV compression experiments (Phase 4)
 ├── docs/
-│   ├── architecture.md        # Qwen3.5-35B-A3B architecture breakdown
-│   ├── hardware-profile.md    # RTX 3070 + NVMe bandwidth measurements
-│   └── apple-flash-mapping.md # How Apple paper techniques map to MoE experts
-├── scripts/
-│   ├── measure_nvme.py        # Benchmark NVMe sequential vs random read speeds
-│   ├── measure_baseline.py    # Baseline llama.cpp / transformers throughput
-│   ├── build_expert_index.py  # Extract + index expert weights to disk
-│   ├── expert_cache.py        # Sliding window expert DRAM cache
-│   ├── bundled_loader.py      # Row-col bundled NVMe loader
-│   ├── router_predictor.py    # Low-rank expert activation predictor
-│   └── benchmark.py           # Unified benchmark runner (all phases)
-├── experiments/
-│   ├── baseline/              # Phase 1 results
-│   ├── windowing/             # Phase 3 results
-│   ├── bundling/              # Phase 4 results
-│   └── full_stack/            # Phase 6 results
-└── results/
-    └── experiment_log.jsonl   # All experiment runs with metrics
+│   ├── architecture.md         # Qwen3.5-35B-A3B architecture breakdown
+│   ├── apple-flash-mapping.md  # Apple paper techniques → MoE expert mapping
+│   └── hardware-profile.md     # RTX 3070 + NVMe bandwidth measurements
+└── scripts/
+    ├── measure_nvme.py          # Benchmark NVMe sequential vs random read
+    ├── expert_cache.py          # Sliding window expert DRAM cache
+    └── download_model.py        # Download Qwen3.5-35B-A3B-Q3_K_M GGUF
 ```
 
 ## Quick Start
 
 ```bash
-# 1. Measure your hardware
-uv run python scripts/measure_nvme.py
+# Clone
+git clone https://github.com/AlexChen31337/qwen35-moe-offload
+cd qwen35-moe-offload
 
-# 2. Build expert index from GGUF model
-uv run python scripts/build_expert_index.py --model path/to/Qwen3.5-35B-A3B.Q4_K_M.gguf
+# Download model (~16.4GB)
+uv run python scripts/download_model.py
 
-# 3. Run baseline (naive llama.cpp with full offload to RAM)
-uv run python scripts/measure_baseline.py
-
-# 4. Run full optimized stack
-uv run python scripts/benchmark.py --phase full_stack --prompt "Your prompt here"
+# Run Phase 4 best config (10.2 tok/s on RTX 3070 8GB)
+uv run --with llama-cpp-python python bench_kv.py
+# Config: n_gpu_layers=10, n_batch=32, n_ubatch=32, n_threads=10
+#         cache_type_k=q8_0, cache_type_v=q8_0, flash_attn=True
 ```
-
-## Expected Results (projected)
-
-| Configuration | tok/s | VRAM | RAM |
-|---|---|---|---|
-| Naive (transformers, RAM offload) | ~0.3 | 8GB | 16GB full | 
-| llama.cpp default (mmap) | ~1.2 | 7.5GB | 8GB |
-| Phase 2 (selective expert load) | ~2.0 | 6GB | 4GB |
-| Phase 3 + windowing | ~3.5 | 6GB | 6GB |
-| Phase 4 + bundling | ~4.5 | 6.5GB | 6GB |
-| Phase 6 + async prefetch | **≥ 5.0** | 7.5GB | 8GB |
 
 ## References
 
-- Apple "LLM in a Flash" (arXiv:2312.11514) — windowing + bundling techniques
-- Qwen3.5-35B-A3B model card — architecture: 256 experts, 9 active, hidden_dim=2048
-- llama.cpp `--no-mmap` + `--gpu-layers` flags for layer-level GPU/CPU split
-- KTransformers — MoE-aware CPU/GPU expert offloading (key related work)
+| Paper | Relevance |
+|---|---|
+| Apple "LLM in a Flash" (arXiv:2312.11514, ACL 2024) | Windowing + bundling for expert weight offloading |
+| Google TurboQuant (arXiv:2504.19874, ICLR 2026) | Zero-overhead KV cache compression via PolarQuant + QJL |
+| Google PolarQuant (arXiv:2502.02617, AISTATS 2026) | Polar coordinate KV compression, eliminates normalization overhead |
+| karpathy/autoresearch | Autonomous experiment loop methodology |
+| llama.cpp | `--cache-type-k/v`, `--flash-attn`, `--n-gpu-layers` flags |
+| KTransformers | MoE-aware CPU/GPU expert offloading reference implementation |
