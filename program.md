@@ -149,3 +149,63 @@ For context length specifically: don't stop at 4096 or 8192 or any number. Keep 
 If KV quant degrades quality: don't stop — find the right compression level. Recalibrate and continue.
 
 When one axis is exhausted, stack the next without asking: KV quant → GPU layers → n_ctx → PolarQuant native → QJL CUDA → async expert prefetch → combinations. The loop never stops on its own.
+
+---
+
+## Phase 5 — PolarQuant + QJL Native KV Compression
+
+**Phase 4 conclusion:** llama.cpp built-in KV quant (q8_0) + flash_attn + 10 GPU layers = **10.20 tok/s** (+54% over Phase 3). Further q4_0 exploration showed diminishing returns at n_ctx=512.
+
+**New axes: research-grade KV compression algorithms**, going beyond llama.cpp's built-in quantization.
+
+### Axis 5A — PolarQuant (arXiv:2502.02617, AISTATS 2026)
+
+Random orthogonal preconditioning → polar decomposition → uniform angle quantization. Zero normalization overhead (no per-block scale/zero-point).
+
+**Implementation:** `scripts/polar_kv.py` (numpy + PyTorch backends)
+**Benchmark:** `bench_polarquant.py`
+
+Key results (standalone, head_dim=128):
+| Config | Compression | Cosine Sim | Encode (ms/640vec) |
+|--------|------------|------------|-------------------|
+| 3-bit  | 5.16×      | 0.58       | 33 (torch)        |
+| 4-bit  | 3.91×      | 0.89       | 33 (torch)        |
+| 5-bit  | 3.15×      | 0.97       | 33 (torch)        |
+| 8-bit  | 1.98×      | 1.00       | 33 (torch)        |
+
+PolarQuant insight validated: after preconditioning, angle mean = 1.569 ≈ π/2, confirming the uniform quantizer assumption.
+
+**Current bottleneck:** Python-level per-token overhead (~44ms encode+decode for 640 KV vectors). For real integration, needs C++/CUDA implementation inside llama.cpp's KV cache management. The torch backend is 6.4× faster than numpy.
+
+### Axis 5B — QJL (arXiv:2406.03482)
+
+Johnson-Lindenstrauss random projection → 1-bit sign quantization. CUDA kernels for GPU-native quantize + attention score computation.
+
+**Implementation:** `/tmp/QJL/` (cloned from github.com/amirzandieh/QJL)
+**Benchmark:** `bench_qjl.py`
+
+Key results (PyTorch GPU path, RTX 3070):
+| Config | Key Compression | Attn Correlation | Encode (ms) |
+|--------|----------------|-----------------|-------------|
+| sketch=128 | 14.22× | 0.55 | 0.33 |
+| sketch=256 | 7.53×  | 0.67 | 0.32 |
+| sketch=512 | 3.88×  | 0.78 | 0.34 |
+
+QJL is **65× faster** than PolarQuant (0.3ms vs 21ms for same data) but has lower attention accuracy at comparable compression ratios. The CUDA kernels (not yet built — needs CUDA_HOME) should be even faster.
+
+### Head-to-Head: PolarQuant vs QJL
+
+| Method | ~4× Compression | Attn Corr | Time (ms) | Best For |
+|--------|-----------------|-----------|-----------|----------|
+| PolarQuant 4-bit | 3.91× | 0.88 | 21.8 | Quality-critical, CPU offload |
+| QJL sketch=512 | 3.88× | 0.78 | 0.34 | Throughput-critical, GPU |
+
+**TurboQuant integration:** The original TurboQuant paper (arXiv:2504.19874) combines PolarQuant (main budget) + QJL (1-bit residual correction). Next step is implementing this combined approach.
+
+### Experiment Queue
+1. ☐ Build QJL CUDA kernels on GPU server (needs CUDA_HOME=/usr/local/cuda)
+2. ☐ Benchmark QJL CUDA kernels vs PyTorch path
+3. ☐ Implement TurboQuant combined: PolarQuant angles + QJL residual
+4. ☐ C++ PolarQuant integration into llama.cpp KV cache
+5. ☐ Full model benchmark: PolarQuant + QJL vs q8_0 baseline at n_ctx=2048+
+6. ☐ Context length scaling: how far can compressed KV push n_ctx before OOM?
