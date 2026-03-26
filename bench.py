@@ -33,12 +33,12 @@ STORAGE_BACKEND = "ram"       # "nvme" | "ram" — this is the key variable
                                # "nvme" = original NVMe path (baseline)
 
 # --- RAM backend config ---
-RAM_BANDWIDTH_GBS = 30.0      # DDR5 effective bandwidth to GPU (PCIe 4.0 ceiling) -- EXP6
+RAM_BANDWIDTH_GBS = 50.0      # DDR5 effective bandwidth to GPU (PCIe 4.0 ceiling) -- EXP16
                                # realistic range: 20–50 GB/s
                                # 50 = DDR5-5600 best case
                                # 20 = DDR4-3200 + PCIe 3.0 mixed path
 
-PIPELINE_OVERLAP = True        # True = prefetch N+1 while GPU computes N -- EXP7
+PIPELINE_OVERLAP = False       # True = prefetch N+1 while GPU computes N -- EXP16
                                # This is the core innovation — hide RAM latency
 
 PREFETCH_WORKERS = 2           # threads loading next-token experts in background -- EXP9
@@ -48,8 +48,8 @@ PREFETCH_WORKERS = 2           # threads loading next-token experts in backgroun
 
 # --- Expert cache (shared between backends) ---
 CACHE_WINDOW_K = 4
-MAX_CACHED_EXPERTS = 100       # keep top-40 in pinned GPU buffer -- EXP15 large
-VRAM_PINNED_EXPERTS = 20       # subset kept in actual VRAM (pinned, zero-copy) -- EXP13
+MAX_CACHED_EXPERTS = 40        # keep top-40 in pinned GPU buffer -- EXP16 best combo
+VRAM_PINNED_EXPERTS = 20       # subset kept in actual VRAM (pinned, zero-copy) -- EXP16
                                # 20 experts × 3MB = 60MB VRAM — negligible
                                # but eliminates PCIe transfer for hot experts
 
