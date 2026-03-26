@@ -1,0 +1,6 @@
+commit	tok_per_sec	n_gpu_layers	n_threads	n_ctx	n_batch	notes
+exp01	6.295	5	8	512	128	batch=128 beats batch=512
+exp02	5.950	5	8	512	256	batch=256 worse than 128
+exp03	6.074	5	8	512	1024	batch=1024 middle ground
+exp04	6.429	5	8	512	64	NEW BEST: batch=64
+exp05	6.345	5	8	512	32	batch=32 slightly worse than 64

@@ -31,7 +31,7 @@ N_CTX = 512
 N_THREADS = 8
 
 # Batch size
-N_BATCH = 512
+N_BATCH = 32
 
 # Test prompt
 PROMPT = "Explain the architecture of Mixture of Experts neural networks in detail:"
