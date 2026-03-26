@@ -1,0 +1,9 @@
+Config: backend=RAM(80.0GB/s,overlap=True,workers=2) k=4 max_cached=40 vram_pinned=1733
+---
+tok_per_sec:         112.191
+total_seconds:       2.3
+peak_vram_mb:        0.0
+peak_ram_mb:         539.0
+nvme_bytes_per_tok:  0
+cache_hit_rate:      1.0
+num_tokens:          256
