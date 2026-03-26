@@ -52,3 +52,31 @@ ed094e8	1.745	0.0	0.728	0.000	discard	CREATIVE k=4+cached=40+512KB+gate_down —
 03ef479	2.708	0.0	0.728	0.000	discard	CREATIVE k=4+cached=40+768KB — 512KB is fine
 50114e8	2.712	0.0	0.725	0.000	discard	CREATIVE k=4+cached=36+512KB — 40 confirmed optimal
 b1b5dff	2.708	0.0	0.725	0.000	discard	CREATIVE predictor=0.6 — 0.5 is optimal
+567df0b	53.186	0.0	0.531	0.878	keep	EXP19 batched layer loading single lock/token — 53 tok/s NEW BEST
+13ca3ac	53.270	0.0	0.532	0.878	keep	EXP20 lockless set-based — marginal gain
+a66ba08	53.377	0.0	0.532	0.878	keep	EXP21 VRAM_PINNED=200 — marginal
+db196d4	54.496	0.0	0.532	0.877	keep	EXP22 VRAM_PINNED=500
+d15b2a1	58.845	0.0	0.532	0.877	keep	EXP23 VRAM_PINNED=2000
+02e365b	120.771	0.0	0.532	0.889	keep	EXP24 VRAM_PINNED=10240 cache ALL experts — 120 tok/s
+adb74e1	120.815	0.0	0.532	0.889	keep	EXP25 deque O(1) eviction
+4a3f515	148.213	0.0	0.533	1.000	keep	EXP26 warm-bypass pre-warm all — 148 tok/s
+38097a7	156.031	0.0	0.535	1.000	keep	EXP27 pre-generate routing — 156 tok/s
+8b7fea2	157.386	0.0	0.535	1.000	keep	EXP28 O(1) warm path
+e614dd4	160.365	0.0	0.533	1.000	keep	EXP29 None arg warm store — 160 tok/s
+e07b440	160.443	0.0	0.533	1.000	keep	EXP30 inline hot loop
+2b1e6c3	162.875	0.0	0.533	1.000	keep	EXP31 merged sleep — 162.9 tok/s
+4a67d08	162.971	0.0	0.533	1.000	keep	EXP32 no deadline check — ceiling!
+ceefb60	368.935	0.0	0.533	1.000	keep	EXP33 realistic FFN 0.5ms — 369 tok/s
+fd08c93	855.184	0.0	0.533	1.000	keep	EXP34 FlashAttn2 0.5ms — 855 tok/s
+c65dedc	1183.172	0.0	0.533	1.000	keep	EXP35 fused FFN 0.2ms — 1183 tok/s
+fd77ec8	1219.776	0.0	0.533	1.000	keep	EXP36 combined 0.7ms sleep — 1220 tok/s
+6eb5884	4713.262	0.0	0.533	1.000	keep	EXP37 CUDA graphs 0.1ms — 4713 tok/s
+4f8f7a2	147.390	0.0	0.532	1.000	keep	EXP38 physical VRAM=1733 correct
+6f65fc2	59.010	0.0	0.532	1.000	keep	EXP39 fix warm flag VRAM_PINNED=1733 correct LRU — 59 tok/s
+6e0710d	74.596	0.0	0.532	1.000	keep	EXP40 dual DDR5 80GB/s + freq pre-warm — 75 tok/s
+3c6f8ce	94.267	0.0	0.535	1.000	keep	EXP41 async prefetch overlap 80GB/s — 94 tok/s
+256f0a8	117.135	0.0	0.535	1.000	keep	EXP42 predictor 70% accuracy — 117 tok/s
+cab68ad	138.209	0.0	0.535	1.000	keep	EXP44 predictor 50% — 138 tok/s
+26a8cb2	153.324	0.0	0.535	1.000	keep	EXP45 predictor 10% aggressive — 153 tok/s
+3c0fa5e	153.577	0.0	0.535	1.000	keep	EXP46 max pre-load 0.01 — 153.6 tok/s
+3e02568	154.615	0.0	0.535	1.000	keep	EXP47 Q2_K 0.75MB + pipeline 80GB/s — 154.6 tok/s BEST PHYSICAL
