@@ -335,21 +335,23 @@ def generate(prompt_tokens: list[int], max_new_tokens: int, nvme_tracker: NVMeTr
     # Avoid method dispatch, attribute lookup per token
     # Hoist constants and check branch once
     if STORAGE_BACKEND == "ram" and store._warm:
-        # Fully optimized warm RAM path — inline everything
-        ffn_sleep = 0.0001 * NUM_LAYERS
-        attn_sleep = 0.002
-        hits_ref = [0]  # mutable counter (avoid attr lookup in loop)
+        # EXP31: Merge attn+FFN into ONE sleep call per token
+        # Reduces syscall overhead from 2 sleep() calls to 1
+        # Combined: 0.002 + 0.004 = 0.006s per token
+        combined_sleep = 0.002 + 0.0001 * NUM_LAYERS
         t_sleep = time.sleep
         t_perf = time.perf_counter
         deadline = t_deadline
+        hits = store._hits_vram
 
         for step in range(max_new_tokens):
             if t_perf() > deadline:
                 break
-            t_sleep(attn_sleep)
-            store._hits_vram += 360
-            t_sleep(ffn_sleep)
+            t_sleep(combined_sleep)  # one sleep instead of two
+            hits += 360
             tokens_generated += 1
+
+        store._hits_vram = hits
 
     elif STORAGE_BACKEND == "ram":
         for step in range(max_new_tokens):
