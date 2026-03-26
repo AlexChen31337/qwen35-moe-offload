@@ -71,8 +71,9 @@ PREFETCH_LOOKAHEAD = 1
 # 0.0 = no prediction (random sampling, like before)
 # 0.7 = 70% of predicted experts actually activated
 # 1.0 = perfect prediction (ideal case)
-PREDICTOR_ACCURACY = 0.50     # EXP44: 50% accuracy — half-confident prefetch
-                               # More experts pre-loaded → more VRAM hits during FFN
+PREDICTOR_ACCURACY = 0.10     # EXP45: aggressive 10% accuracy (pre-load everything)
+                               # Loads ALL 9 experts per layer into VRAM proactively
+                               # Max DMA during attention window
 
 # ---------------------------------------------------------------------------
 # RAM Expert Store — Optimized with deque + set, batched layer loading
