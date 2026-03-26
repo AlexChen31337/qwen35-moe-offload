@@ -145,3 +145,23 @@ Start with these, then improvise:
 If KV quant degrades quality measurably (outputs become incoherent), back off and find the right quant level — don't stop, recalibrate.
 
 When one axis is exhausted, stack the next: KV quant → GPU layers → context length → PolarQuant native implementation → async expert prefetch. Keep going.
+6. ☐ Context length scaling: how far can compressed KV push n_ctx before OOM?
+
+---
+
+## Phase 5 — Native C/CUDA Implementation (Next)
+
+**Why Python is wrong for KV compression:**
+- 280+ Python→C crossings/second at 10 tok/s with 28 layers
+- At n_ctx=4096: catastrophic overhead per step
+- QJL's 65× speed advantage over PolarQuant Python is pure overhead, not math
+
+**The right approach:**
+1. Implement PolarQuant as a llama.cpp patch — add `GGML_TYPE_POLAR_Q4` as a new KV cache type
+2. Hadamard preconditioner → CUDA kernel (massively parallel, embarrassingly parallelizable)
+3. Angle quantization → pack into existing ggml tensor infrastructure
+4. Wire via `--cache-type-k polar_q4` flag (same pattern as existing q8_0/q4_0)
+
+**Reference:** llama.cpp `src/llama-kv-cache.cpp` and `ggml/src/ggml-cuda/quantize.cu` for existing KV quant patterns.
+
+**Goal:** PolarQuant at C/CUDA speed should approach or beat q4_0 in throughput while delivering better compression (3.91× vs 2×).
