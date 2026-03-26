@@ -33,7 +33,7 @@ STORAGE_BACKEND = "ram"       # "nvme" | "ram" — this is the key variable
                                # "nvme" = original NVMe path (baseline)
 
 # --- RAM backend config ---
-RAM_BANDWIDTH_GBS = 20.0      # DDR5 effective bandwidth to GPU (PCIe 4.0 ceiling) -- EXP4
+RAM_BANDWIDTH_GBS = 10.0      # DDR5 effective bandwidth to GPU (PCIe 4.0 ceiling) -- EXP5
                                # realistic range: 20–50 GB/s
                                # 50 = DDR5-5600 best case
                                # 20 = DDR4-3200 + PCIe 3.0 mixed path
