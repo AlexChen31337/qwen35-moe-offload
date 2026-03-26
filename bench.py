@@ -45,9 +45,10 @@ PREFETCH_WORKERS = 2           # threads loading next-token experts in backgroun
 # --- Expert cache (shared between backends) ---
 CACHE_WINDOW_K = 4             # sliding window size
 MAX_CACHED_EXPERTS = 40        # keep top-40 in pinned GPU buffer -- EXP16 best combo
-VRAM_PINNED_EXPERTS = 2000     # EXP23: almost cache everything in VRAM
-                               # 2000 experts per layer = practically all 256 experts for ~8 layers
-                               # But spread across 40 layers: ~50 experts/layer pinned
+VRAM_PINNED_EXPERTS = 10240    # EXP24: cache ALL experts in VRAM (256 × 40 = 10240)
+                               # This pins every expert from every layer
+                               # After warmup: 100% VRAM hit rate → zero transfer cost
+                               # Only RAM hits for first 10240 loads
 
 # --- NVMe backend config (baseline comparison) ---
 READ_ALIGN_BYTES = 524288      # 512KB — from best NVMe config
