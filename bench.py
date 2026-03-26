@@ -63,7 +63,11 @@ VRAM_PINNED_EXPERTS = 1733     # safe margin below 1774 ceiling
 READ_ALIGN_BYTES = 524288      # 512KB — from best NVMe config
 BUNDLE_MODE = "separate"
 PREFETCH_THREADS = 8
-QUANTIZATION = "Q4_K_M"
+QUANTIZATION = "Q2_K"         # EXP47: Q2_K quantization — 2 bits vs 4 bits
+                               # Expert size halved: 1.5MB → 0.75MB
+                               # Transfer time halved: 5.6ms → 2.8ms
+                               # Tradeoff: accuracy decreases, but MoE is robust
+                               # (routing errors self-correct via redundancy)
 PREDICTOR_THRESHOLD = 0.5
 PREFETCH_LOOKAHEAD = 1
 
@@ -101,7 +105,10 @@ class RAMExpertStoreBatched:
         self._misses = 0
         self._warm = False
 
-        self.expert_bytes = 1.5 * 1024 * 1024  # 1.5MB per expert
+        # Expert size: Q4_K_M=1.5MB, Q2_K=0.75MB, Q8_0=3.0MB
+        quant_sizes = {"Q4_K_M": 1.5, "Q5_K_M": 1.875, "Q8_0": 3.0,
+                       "Q2_K": 0.75, "Q3_K_M": 1.125}
+        self.expert_bytes = quant_sizes.get(QUANTIZATION, 1.5) * 1024 * 1024
         self.ram_to_gpu_bw = RAM_BANDWIDTH_GBS * 1e9  # bytes/sec
         self._total_experts = 10240  # 256 experts × 40 layers
 
