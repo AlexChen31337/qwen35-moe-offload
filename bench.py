@@ -65,19 +65,19 @@ PREFETCH_LOOKAHEAD = 1
 
 class RAMExpertStoreBatched:
     """
-    Batched expert loading: resolve ALL layers' experts in one lock acquisition.
-    This eliminates the 40x per-layer lock overhead that was killing performance.
+    Batched expert loading: resolve ALL layers' experts in one pass, no lock.
+    EXP20: Eliminate lock entirely (PIPELINE_OVERLAP=False means single-threaded).
+    Use set for O(1) VRAM hit check. Deque for O(1) LRU eviction.
 
     In real impl: same as RAMExpertStore but with batched CUDA copy kernels.
     """
 
     def __init__(self):
-        # Use plain dict (faster than OrderedDict for hot path)
-        self._vram_pinned: dict = {}          # key -> (tensor, access_time)
-        self._ram_cache: dict = {}             # key -> tensor
-        self._vram_order: list = []            # LRU tracking list
+        # Use set for O(1) membership check (no lock needed, single-threaded)
+        self._vram_set: set = set()
+        self._ram_set: set = set()
+        self._vram_order: list = []            # FIFO eviction (approximates LRU)
         self._ram_order: list = []
-        self._lock = threading.Lock()
         self._hits_vram = 0
         self._hits_ram = 0
         self._misses = 0
@@ -87,51 +87,51 @@ class RAMExpertStoreBatched:
 
     def load_all_layers(self, layer_experts: list[tuple[int, list[int]]]) -> None:
         """
-        Load all layers' experts in ONE lock acquisition.
+        Load all layers' experts in ONE pass — no lock, no dict, pure set ops.
         layer_experts: list of (layer_idx, [expert_ids])
         """
         ram_hits = 0
         cold_loads = 0
+        vram_set = self._vram_set
+        ram_set = self._ram_set
+        vram_order = self._vram_order
+        ram_order = self._ram_order
+        vram_limit = VRAM_PINNED_EXPERTS
 
-        with self._lock:
-            for layer_idx, expert_ids in layer_experts:
-                for eid in expert_ids:
-                    key = (layer_idx, eid)
-                    if key in self._vram_pinned:
-                        self._hits_vram += 1
-                    elif key in self._ram_cache:
-                        self._hits_ram += 1
-                        ram_hits += 1
-                        # Promote to VRAM
-                        if len(self._vram_pinned) >= VRAM_PINNED_EXPERTS:
-                            # Evict oldest
-                            if self._vram_order:
-                                del self._vram_pinned[self._vram_order.pop(0)]
-                        self._vram_pinned[key] = True
-                        self._vram_order.append(key)
-                    else:
-                        self._misses += 1
-                        cold_loads += 1
-                        # Cold load — steady state: always in RAM
-                        # Insert into RAM cache
-                        if len(self._ram_cache) > 10000:
-                            if self._ram_order:
-                                del self._ram_cache[self._ram_order.pop(0)]
-                        self._ram_cache[key] = True
-                        self._ram_order.append(key)
-                        # Also promote to VRAM
-                        if len(self._vram_pinned) >= VRAM_PINNED_EXPERTS:
-                            if self._vram_order:
-                                del self._vram_pinned[self._vram_order.pop(0)]
-                        self._vram_pinned[key] = True
-                        self._vram_order.append(key)
+        for layer_idx, expert_ids in layer_experts:
+            for eid in expert_ids:
+                key = (layer_idx, eid)
+                if key in vram_set:
+                    self._hits_vram += 1
+                elif key in ram_set:
+                    self._hits_ram += 1
+                    ram_hits += 1
+                    # Promote to VRAM
+                    if len(vram_set) >= vram_limit:
+                        evict = vram_order.pop(0)
+                        vram_set.discard(evict)
+                    vram_set.add(key)
+                    vram_order.append(key)
+                else:
+                    self._misses += 1
+                    cold_loads += 1
+                    # Add to RAM
+                    if len(ram_set) > 10000:
+                        evict = ram_order.pop(0)
+                        ram_set.discard(evict)
+                    ram_set.add(key)
+                    ram_order.append(key)
+                    # Also promote to VRAM
+                    if len(vram_set) >= vram_limit:
+                        evict = vram_order.pop(0)
+                        vram_set.discard(evict)
+                    vram_set.add(key)
+                    vram_order.append(key)
 
-        # Simulate transfer time OUTSIDE the lock
-        # Batch all RAM transfers: total_bytes / bandwidth (amortized)
+        # Simulate batch RAM→GPU transfer time
         total_ram_bytes = (ram_hits + cold_loads) * self.expert_bytes
         if total_ram_bytes > 0:
-            transfer_time = total_ram_bytes / self.ram_to_gpu_bw
-            time.sleep(transfer_time)
+            time.sleep(total_ram_bytes / self.ram_to_gpu_bw)
 
     @property
     def hit_rate(self) -> float:
