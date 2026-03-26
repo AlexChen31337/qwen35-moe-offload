@@ -283,3 +283,48 @@ An agent can iterate on cache parameters (k size, prefetch depth, quantization l
 | llama.cpp `--no-mmap` + `--split-mode` | Layer-level GPU/CPU split, our starting point |
 | DeepSeek-V2 expert offloading | Shows MoE offload is viable at scale with proper caching |
 | ExpertFlow (2024) | Expert-level NVMe offloading, most related prior work |
+
+---
+
+## Phase 4 Goal Update — TurboQuant KV Compression (2026-03-26)
+
+**New optimization axis added:** KV cache compression via TurboQuant-style quantization.
+
+### Motivation
+Phase 3 real results (6.14 tok/s at n_ctx=512) revealed two bottlenecks:
+1. **Expert weight I/O** — addressed by flash offload (Apple 2312.11514 approach)
+2. **KV cache memory** — untouched so far; limits usable context length on 8GB VRAM
+
+TurboQuant (Google Research, ICLR 2026, arXiv:2504.19874) achieves **zero-overhead KV compression**:
+- **PolarQuant**: polar coordinate encoding eliminates per-block normalization constants
+- **QJL**: 1-bit residual error correction via Johnson-Lindenstrauss transform
+- Net effect: 4-8× KV cache memory reduction with zero accuracy loss on long-context benchmarks
+
+### Phase 4 Experiments
+
+| Experiment | What to try | Expected gain |
+|---|---|---|
+| KV quant baseline | `--cache-type-k q8_0 --cache-type-v q8_0` (llama.cpp built-in) | ~1.5-2× VRAM savings |
+| KV quant aggressive | `--cache-type-k q4_0 --cache-type-v q4_0` | ~3-4× VRAM savings, check accuracy |
+| Context extension | With KV quant: push n_ctx 512→2048→4096 | More context, same VRAM budget |
+| TurboQuant native | Implement PolarQuant rotation on KV vectors (Python wrapper) | Optimal: zero-overhead compression |
+
+### Updated Success Criteria
+
+| Metric | Phase 3 achieved | Phase 4 target |
+|---|---|---|
+| Tokens/second | 6.14 tok/s | ≥ 8 tok/s |
+| Peak VRAM | 1387 MB (n_ctx=512) | ≤ 2500 MB (n_ctx=4096) |
+| Context length | 512 tokens | ≥ 4096 tokens |
+| KV compression ratio | 1× (fp16) | ≥ 4× |
+
+### Key insight
+Flash offload + TurboQuant KV compression are **orthogonal** — both apply simultaneously:
+- Flash offload frees VRAM by streaming expert weights from NVMe
+- TurboQuant frees VRAM by compressing the KV cache
+- Combined: run longer contexts AND larger models on the same 8GB GPU
+
+### Reference
+- TurboQuant paper: arXiv:2504.19874 (Google Research, ICLR 2026)
+- llama.cpp KV cache quant docs: `--cache-type-k` / `--cache-type-v` flags
+- PolarQuant: arXiv:2502.02617 (AISTATS 2026)
