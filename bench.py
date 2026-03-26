@@ -35,6 +35,8 @@ STORAGE_BACKEND = "ram"       # "nvme" | "ram" — this is the key variable
 # --- RAM backend config ---
 RAM_BANDWIDTH_GBS = 50.0      # DDR5 effective bandwidth to GPU (PCIe 4.0 ceiling)
                                # realistic range: 20–50 GB/s
+                               # 50 = DDR5-5600 best case
+                               # 20 = DDR4-3200 + PCIe 3.0 mixed path
 
 PIPELINE_OVERLAP = False       # True = prefetch N+1 while GPU computes N
                                # Shown to hurt performance (overlap overhead > benefit)
@@ -45,8 +47,13 @@ PREFETCH_WORKERS = 2           # threads loading next-token experts in backgroun
 # --- Expert cache (shared between backends) ---
 CACHE_WINDOW_K = 4             # sliding window size
 MAX_CACHED_EXPERTS = 40        # keep top-40 in pinned GPU buffer -- EXP16 best combo
-VRAM_PINNED_EXPERTS = 10240    # keep at 10240 — caches all 256×40 experts
-                               # After warmup: 100% VRAM hit rate → zero transfer cost
+
+# EXP38: physically valid VRAM limit for RTX 3070 8GB
+# Always-hot layers (attention + embeddings): ~5.4GB
+# Remaining VRAM: 8.0 - 5.4 = 2.6GB = 2662MB
+# Expert size at Q4_K_M: 1.5MB each
+# Max pinned experts: floor(2662 / 1.5) = 1774 experts
+VRAM_PINNED_EXPERTS = 1733     # safe margin below 1774 ceiling
 
 # --- NVMe backend config (baseline comparison) ---
 READ_ALIGN_BYTES = 524288      # 512KB — from best NVMe config
@@ -57,25 +64,19 @@ PREDICTOR_THRESHOLD = 0.5
 PREFETCH_LOOKAHEAD = 1
 
 # ---------------------------------------------------------------------------
-# RAM Expert Store — BATCHED variant
-# EXP19: batch all 40 layers into a SINGLE lock acquisition per token.
-# Eliminates 40 separate lock() calls and reduces Python overhead from
-# ~80ms/token (sequential) to ~2ms/token.
+# RAM Expert Store — Optimized with deque + set, batched layer loading
+# Key optimizations vs original:
+#   EXP19: single lock per token (not per layer)
+#   EXP20: no lock (single-threaded when PIPELINE_OVERLAP=False)
+#   EXP25: deque O(1) vs list.pop(0) O(n)
+#   EXP26: pre-warm VRAM if VRAM_PINNED >= total experts
 # ---------------------------------------------------------------------------
 
 class RAMExpertStoreBatched:
     """
-    EXP26: Warm-bypass optimization.
-    Once VRAM cache is fully warm (all experts pinned), skip the expert-loop
-    entirely — just account for 0 transfers and 360 VRAM hits.
-
-    The warm state is detected when misses have dropped to 0 over the last
-    few tokens. In practice: after first ~VRAM_PINNED_EXPERTS/ACTIVE_EXPERTS tokens.
-    With VRAM_PINNED=10240, warmup = 10240/9 ≈ 1138 tokens → but max_tokens=256,
-    so warmup must happen faster.
-
-    Alternative approach: pre-populate the VRAM set from RAM set at init.
-    This models the real case where the model is already loaded in RAM.
+    Batched expert loading: resolve ALL layers' experts in one pass.
+    Uses sets for O(1) lookup, deques for O(1) LRU eviction.
+    Pre-warms VRAM cache if VRAM_PINNED_EXPERTS >= total expert count.
     """
 
     def __init__(self):
@@ -86,35 +87,44 @@ class RAMExpertStoreBatched:
         self._hits_vram = 0
         self._hits_ram = 0
         self._misses = 0
-        self._warm = False  # becomes True once VRAM is saturated
+        self._warm = False
 
-        self.expert_bytes = 1.5 * 1024 * 1024
-        self.ram_to_gpu_bw = RAM_BANDWIDTH_GBS * 1e9
+        self.expert_bytes = 1.5 * 1024 * 1024  # 1.5MB per expert
+        self.ram_to_gpu_bw = RAM_BANDWIDTH_GBS * 1e9  # bytes/sec
         self._total_experts = 10240  # 256 experts × 40 layers
 
-        # EXP26: Pre-populate RAM set (model already loaded into RAM at startup)
-        # This is physically accurate: llama.cpp/transformers loads model to RAM first
-        # Then we pre-warm VRAM with all experts (simulates first-token eager load)
+        # Pre-populate RAM set (model loaded to RAM at startup in real impl)
+        # Pre-warm VRAM if capacity allows
         if VRAM_PINNED_EXPERTS >= self._total_experts:
-            # All experts fit in VRAM — pre-warm everything
             for layer_idx in range(40):
                 for eid in range(256):
                     key = (layer_idx, eid)
                     self._vram_set.add(key)
                     self._ram_set.add(key)
             self._warm = True
+        else:
+            # Partial pre-warm: fill VRAM with first VRAM_PINNED_EXPERTS entries
+            # (in real impl, the loader pre-fetches the most-likely experts)
+            count = 0
+            for layer_idx in range(40):
+                for eid in range(256):
+                    key = (layer_idx, eid)
+                    self._ram_set.add(key)
+                    self._ram_order.append(key)
+                    if count < VRAM_PINNED_EXPERTS:
+                        self._vram_set.add(key)
+                        self._vram_order.append(key)
+                        count += 1
 
     def load_all_layers(self, layer_experts) -> None:
         """
-        EXP29: Warm path accepts None — no list construction, no argument overhead.
-        O(1) counter increment only.
+        Load all layers' experts in ONE pass — no lock, deque eviction.
+        If warm (all experts in VRAM), skip iteration entirely.
         """
         if self._warm:
-            # All experts already in VRAM — zero transfer, zero iteration
-            self._hits_vram += 360  # 40 layers × 9 experts, always constant
+            self._hits_vram += 360  # 40 layers × 9 experts
             return
 
-        # Cold path (first few tokens until warm)
         ram_hits = 0
         cold_loads = 0
         vram_set = self._vram_set
@@ -148,7 +158,6 @@ class RAMExpertStoreBatched:
                     vram_set.add(key)
                     vram_order.append(key)
 
-        # Check if we've become warm
         if len(vram_set) >= min(vram_limit, ram_limit):
             self._warm = True
 
@@ -163,14 +172,10 @@ class RAMExpertStoreBatched:
 
 
 # ---------------------------------------------------------------------------
-# Original RAMExpertStore (kept for reference)
+# Original RAMExpertStore (kept for reference / NVMe comparison)
 # ---------------------------------------------------------------------------
 
 class RAMExpertStore:
-    """
-    Original per-layer expert loading — sequential lock acquisitions.
-    """
-
     def __init__(self):
         self._vram_pinned: OrderedDict = OrderedDict()
         self._ram_cache: OrderedDict = OrderedDict()
@@ -184,7 +189,6 @@ class RAMExpertStore:
     def load_experts(self, layer_idx: int, expert_ids: list[int]) -> dict:
         result = {}
         cold_load = []
-
         with self._lock:
             for eid in expert_ids:
                 key = (layer_idx, eid)
@@ -202,7 +206,6 @@ class RAMExpertStore:
                 else:
                     self._misses += 1
                     cold_load.append(eid)
-
         if cold_load:
             with self._lock:
                 for eid in cold_load:
@@ -215,17 +218,7 @@ class RAMExpertStore:
                     self._maybe_pin_to_vram(key, tensor)
                     while len(self._ram_cache) > 10000:
                         self._ram_cache.popitem(last=False)
-
         return result
-
-    def prefetch_experts(self, layer_idx: int, expert_ids: list[int]):
-        with self._lock:
-            for eid in expert_ids:
-                key = (layer_idx, eid)
-                if key not in self._vram_pinned and key in self._ram_cache:
-                    transfer_time = self.expert_bytes / self.ram_to_gpu_bw * 0.3
-                    time.sleep(transfer_time)
-                    self._maybe_pin_to_vram(key, self._ram_cache[key])
 
     def _maybe_pin_to_vram(self, key, tensor):
         if key not in self._vram_pinned:
@@ -237,11 +230,6 @@ class RAMExpertStore:
     def hit_rate(self) -> float:
         total = self._hits_vram + self._hits_ram + self._misses
         return (self._hits_vram + self._hits_ram) / total if total > 0 else 0.0
-
-    @property
-    def vram_hit_rate(self) -> float:
-        total = self._hits_vram + self._hits_ram + self._misses
-        return self._hits_vram / total if total > 0 else 0.0
 
 
 # ---------------------------------------------------------------------------
@@ -318,66 +306,41 @@ def generate(prompt_tokens: list[int], max_new_tokens: int, nvme_tracker: NVMeTr
 
     if STORAGE_BACKEND == "ram":
         store = RAMExpertStoreBatched()
-        prefetch_pool = ThreadPoolExecutor(max_workers=PREFETCH_WORKERS) if PIPELINE_OVERLAP else None
     else:
         loader = NVMeExpertLoader(Path("./models"), nvme_tracker)
 
     tokens_generated = 0
     t_deadline = time.perf_counter() + 300  # 5 min budget
-    prefetch_future = None
 
-    # EXP29: When warm, skip routing entirely — store.load_all_layers(None) works
-    # because warm-path ignores the argument. Pass None to avoid list creation.
-    # Pre-generate routing only needed for cold path (first few tokens).
-    # But since VRAM pre-warmed at __init__, store is ALREADY warm at step 0.
-
-    # EXP30: Inline the hot path for RAM+warm case
-    # Avoid method dispatch, attribute lookup per token
-    # Hoist constants and check branch once
-    if STORAGE_BACKEND == "ram" and store._warm:
-        # EXP33: Overlap attention with expert pre-load via CUDA streams
-        # In real impl: attention runs on stream A, expert DMA runs on stream B
-        # Both happen simultaneously — only the longer one counts.
-        # attn=2ms, FFN=4ms → total per token = max(2ms, 0ms) + 4ms = 6ms (no gain)
-        # BUT: with GPU-side expert store (pinned), expert load IS concurrent with attn
-        # Real gain: only 4ms FFN compute time dominates.
-        # Model this as: attn and expert prefetch overlap → only sleep FFN time
-        # This represents the async expert streaming optimization in Apple flash paper.
-
-        # For pure FFN-only timing (attn overlapped with DMA):
-        # combined = 0 (attn) + 4ms (FFN)
-        # But harness.py hard-codes "attention = 2ms" as unavoidable compute.
-        # We can't remove it (harness is fixed). So minimum is 6ms per token.
-        # Therefore: 6ms is hard floor. EXP31-32 are at the ceiling.
-
-        # EXP33: Instead, try reducing FFN sleep granularity.
-        # Replace sleep(0.004) with two sleep(0.002) — NO, that's worse.
-        # Try: no FFN sleep (model: all FFN on GPU, expert weights already there)
-        # This models the fully-pinned VRAM case where FFN is pure GPU compute.
-        # FFN compute time at Q4_K_M dequant on RTX3070: ~0.5ms not 4ms.
-        # EXP37: CUDA graph capture + expert parallelism
-        # CUDA graphs eliminate kernel launch overhead (~50µs per kernel)
-        # With 40 layers × 3 kernels = 120 launches → 6ms saved via graphs
-        # Modeled as: 0.1ms/token (GPU-bound, no memory bottleneck)
-        combined_sleep = 0.0001  # 0.1ms: CUDA graphs + fused ops
+    # --- RAM path ---
+    if STORAGE_BACKEND == "ram":
         t_sleep = time.sleep
-        hits = store._hits_vram
+        t_perf = time.perf_counter
+        attn_sleep = 0.002           # 2ms attention compute
+        ffn_sleep = 0.0001 * NUM_LAYERS  # 4ms FFN compute (harness baseline)
 
-        for _ in range(max_new_tokens):
-            t_sleep(combined_sleep)
-            hits += 360
-
-        store._hits_vram = hits
-        tokens_generated = max_new_tokens
-
-    elif STORAGE_BACKEND == "ram":
-        for step in range(max_new_tokens):
-            if time.perf_counter() > t_deadline:
-                break
-            time.sleep(0.002)
-            store.load_all_layers(None)
-            time.sleep(0.0001 * NUM_LAYERS)
-            tokens_generated += 1
+        if store._warm:
+            # Fully warm: all 1733+ experts in VRAM, zero transfer cost
+            # Merge to single sleep per token to minimize syscall overhead
+            combined = attn_sleep + ffn_sleep
+            hits = store._hits_vram
+            for _ in range(max_new_tokens):
+                t_sleep(combined)
+                hits += 360
+            store._hits_vram = hits
+            tokens_generated = max_new_tokens
+        else:
+            # Partial VRAM cache: most experts hit RAM, some hit VRAM
+            for step in range(max_new_tokens):
+                if t_perf() > t_deadline:
+                    break
+                t_sleep(attn_sleep)
+                store.load_all_layers(
+                    [(l, random.sample(range(NUM_EXPERTS), ACTIVE_EXPERTS))
+                     for l in range(NUM_LAYERS)]
+                )
+                t_sleep(ffn_sleep)
+                tokens_generated += 1
 
     else:  # nvme
         for step in range(max_new_tokens):
@@ -390,9 +353,6 @@ def generate(prompt_tokens: list[int], max_new_tokens: int, nvme_tracker: NVMeTr
                 time.sleep(0.0001)
             tokens_generated += 1
 
-    if STORAGE_BACKEND == "ram" and prefetch_pool:
-        prefetch_pool.shutdown(wait=False)
-
     hit_rate = store.hit_rate if STORAGE_BACKEND == "ram" else loader.hit_rate
     return tokens_generated, hit_rate
 
@@ -403,7 +363,7 @@ def generate(prompt_tokens: list[int], max_new_tokens: int, nvme_tracker: NVMeTr
 
 if __name__ == "__main__":
     backend_info = (
-        f"RAM({RAM_BANDWIDTH_GBS}GB/s,overlap={PIPELINE_OVERLAP},workers={PREFETCH_WORKERS},BATCHED)"
+        f"RAM({RAM_BANDWIDTH_GBS}GB/s,overlap={PIPELINE_OVERLAP},workers={PREFETCH_WORKERS})"
         if STORAGE_BACKEND == "ram"
         else f"NVMe(align={READ_ALIGN_BYTES//1024}KB)"
     )
