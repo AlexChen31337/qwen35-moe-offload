@@ -28,10 +28,10 @@ N_GPU_LAYERS = 5
 N_CTX = 512
 
 # Threads for CPU inference (experts not in VRAM)
-N_THREADS = 8
+N_THREADS = 10
 
 # Batch size
-N_BATCH = 32
+N_BATCH = 64
 
 # Test prompt
 PROMPT = "Explain the architecture of Mixture of Experts neural networks in detail:"

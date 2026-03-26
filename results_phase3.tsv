@@ -4,3 +4,8 @@ exp02	5.950	5	8	512	256	batch=256 worse than 128
 exp03	6.074	5	8	512	1024	batch=1024 middle ground
 exp04	6.429	5	8	512	64	NEW BEST: batch=64
 exp05	6.345	5	8	512	32	batch=32 slightly worse than 64
+exp06	6.255	3	8	512	64	layers=3 worse than layers=5 with batch=64
+exp07	6.370	7	8	512	64	layers=7 slightly worse than layers=5
+exp08	6.390	8	8	512	64	layers=8 still below best at layers=5
+exp09	5.735	5	9	512	64	threads=9 hurts — hyperthreading contention
+exp10	6.499	5	10	512	64	NEW BEST: threads=10 batch=64
