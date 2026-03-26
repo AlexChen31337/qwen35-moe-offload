@@ -103,18 +103,14 @@ class RAMExpertStoreBatched:
                     self._ram_set.add(key)
             self._warm = True
         else:
-            # Partial pre-warm: fill VRAM with first VRAM_PINNED_EXPERTS entries
-            # (in real impl, the loader pre-fetches the most-likely experts)
-            count = 0
+            # Partial pre-warm: fill RAM with all experts (model loaded at startup)
+            # VRAM starts empty — experts promoted on access (realistic LRU behavior)
             for layer_idx in range(40):
                 for eid in range(256):
                     key = (layer_idx, eid)
                     self._ram_set.add(key)
                     self._ram_order.append(key)
-                    if count < VRAM_PINNED_EXPERTS:
-                        self._vram_set.add(key)
-                        self._vram_order.append(key)
-                        count += 1
+            # _warm stays False — VRAM cache fills via LRU during generation
 
     def load_all_layers(self, layer_experts) -> None:
         """
@@ -158,8 +154,9 @@ class RAMExpertStoreBatched:
                     vram_set.add(key)
                     vram_order.append(key)
 
-        if len(vram_set) >= min(vram_limit, ram_limit):
-            self._warm = True
+        # Only truly "warm" when ALL experts are in VRAM (requires VRAM_PINNED >= 10240)
+        # With physical limit (1733), we never reach fully warm — steady state is
+        # LRU cache cycling through 1733/10240 = 16.9% VRAM hit rate
 
         total_ram_bytes = (ram_hits + cold_loads) * self.expert_bytes
         if total_ram_bytes > 0:
