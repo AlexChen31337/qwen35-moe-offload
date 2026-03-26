@@ -1,0 +1,2 @@
+exp	tok_per_sec	vram_peak_mb	n_ctx	type_k	type_v	flash_attn	status	description
+1	8.257	3601	512	f16	f16	False	baseline	Phase 4 baseline — f16 KV, same config as phase3 best
