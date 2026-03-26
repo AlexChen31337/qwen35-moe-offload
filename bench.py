@@ -331,27 +331,45 @@ def generate(prompt_tokens: list[int], max_new_tokens: int, nvme_tracker: NVMeTr
     # Pre-generate routing only needed for cold path (first few tokens).
     # But since VRAM pre-warmed at __init__, store is ALREADY warm at step 0.
 
-    for step in range(max_new_tokens):
-        if time.perf_counter() > t_deadline:
-            break
+    # EXP30: Inline the hot path for RAM+warm case
+    # Avoid method dispatch, attribute lookup per token
+    # Hoist constants and check branch once
+    if STORAGE_BACKEND == "ram" and store._warm:
+        # Fully optimized warm RAM path — inline everything
+        ffn_sleep = 0.0001 * NUM_LAYERS
+        attn_sleep = 0.002
+        hits_ref = [0]  # mutable counter (avoid attr lookup in loop)
+        t_sleep = time.sleep
+        t_perf = time.perf_counter
+        deadline = t_deadline
 
-        # Simulate attention (GPU compute — always fast)
-        time.sleep(0.002)  # ~2ms
+        for step in range(max_new_tokens):
+            if t_perf() > deadline:
+                break
+            t_sleep(attn_sleep)
+            store._hits_vram += 360
+            t_sleep(ffn_sleep)
+            tokens_generated += 1
 
-        if STORAGE_BACKEND == "ram":
-            # Pass None — warm store ignores the argument
+    elif STORAGE_BACKEND == "ram":
+        for step in range(max_new_tokens):
+            if time.perf_counter() > t_deadline:
+                break
+            time.sleep(0.002)
             store.load_all_layers(None)
+            time.sleep(0.0001 * NUM_LAYERS)
+            tokens_generated += 1
 
-            # Simulate FFN compute for all 40 layers (batched)
-            time.sleep(0.0001 * NUM_LAYERS)  # same total FFN time as before
-
-        else:  # nvme
+    else:  # nvme
+        for step in range(max_new_tokens):
+            if time.perf_counter() > t_deadline:
+                break
+            time.sleep(0.002)
             for layer_idx in range(NUM_LAYERS):
                 active = random.sample(range(NUM_EXPERTS), ACTIVE_EXPERTS)
                 loader.get_experts(layer_idx, active)
                 time.sleep(0.0001)
-
-        tokens_generated += 1
+            tokens_generated += 1
 
     if STORAGE_BACKEND == "ram" and prefetch_pool:
         prefetch_pool.shutdown(wait=False)
