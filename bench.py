@@ -38,7 +38,7 @@ RAM_BANDWIDTH_GBS = 50.0      # DDR5 effective bandwidth to GPU (PCIe 4.0 ceilin
                                # 50 = DDR5-5600 best case
                                # 20 = DDR4-3200 + PCIe 3.0 mixed path
 
-PIPELINE_OVERLAP = False       # True = prefetch N+1 while GPU computes N -- EXP16
+PIPELINE_OVERLAP = True        # True = prefetch N+1 while GPU computes N -- EXP17
                                # This is the core innovation — hide RAM latency
 
 PREFETCH_WORKERS = 2           # threads loading next-token experts in background -- EXP9
