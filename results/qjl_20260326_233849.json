@@ -1,0 +1,99 @@
+{
+  "gpu": {
+    "cuda_available": true,
+    "device": "cuda",
+    "gpu_name": "NVIDIA GeForce RTX 3070",
+    "gpu_memory_gb": 7.64801025390625,
+    "cuda_version": "13.0"
+  },
+  "config": {
+    "head_dim": 128,
+    "n_layers": 40,
+    "n_kv_heads": 8,
+    "n_q_heads": 28,
+    "qjl_sketch_dim": 256,
+    "qjl_value_bits": 2,
+    "n_ctx": 512
+  },
+  "qjl_standalone": {
+    "jl_projection": {
+      "sketch_dim": 256,
+      "head_dim": 128,
+      "key_compression_ratio": 7.53,
+      "total_kv_compression_ratio": 6.24,
+      "encode_ms": 15.978,
+      "decode_ms": 6.087,
+      "attention_correlation": 0.6673,
+      "mean_relative_error": 6.5134,
+      "seq_len": 512,
+      "original_kv_mb": 80.0,
+      "compressed_kv_mb": 12.8,
+      "vram_savings_mb": 67.2
+    },
+    "cuda_kernels": {
+      "status": "not_built",
+      "error": "cannot import name 'cuda_qjl_quant' from partially initialized module 'qjl_kernel' (most likely due to a circular import) (/tmp/QJL/qjl_kernel/qjl_kernel.py)"
+    },
+    "sweep": [
+      {
+        "sketch_dim": 64,
+        "bits_per_key": 80,
+        "key_ratio": 25.6,
+        "correlation": 0.4052
+      },
+      {
+        "sketch_dim": 128,
+        "bits_per_key": 144,
+        "key_ratio": 14.22,
+        "correlation": 0.5324
+      },
+      {
+        "sketch_dim": 256,
+        "bits_per_key": 272,
+        "key_ratio": 7.53,
+        "correlation": 0.672
+      },
+      {
+        "sketch_dim": 512,
+        "bits_per_key": 528,
+        "key_ratio": 3.88,
+        "correlation": 0.7858
+      }
+    ]
+  },
+  "comparison": {
+    "polar_3bit": {
+      "compression_ratio": 5.16,
+      "attention_correlation": 0.6129,
+      "time_ms": 63.16
+    },
+    "polar_4bit": {
+      "compression_ratio": 3.91,
+      "attention_correlation": 0.8848,
+      "time_ms": 21.83
+    },
+    "polar_5bit": {
+      "compression_ratio": 3.15,
+      "attention_correlation": 0.9708,
+      "time_ms": 21.84
+    },
+    "qjl_s128": {
+      "compression_ratio": 14.22,
+      "attention_correlation": 0.5537,
+      "time_ms": 0.33,
+      "sketch_dim": 128
+    },
+    "qjl_s256": {
+      "compression_ratio": 7.53,
+      "attention_correlation": 0.6666,
+      "time_ms": 0.32,
+      "sketch_dim": 256
+    },
+    "qjl_s512": {
+      "compression_ratio": 3.88,
+      "attention_correlation": 0.7805,
+      "time_ms": 0.34,
+      "sketch_dim": 512
+    }
+  }
+}

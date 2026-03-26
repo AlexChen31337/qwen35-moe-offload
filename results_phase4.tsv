@@ -53,8 +53,8 @@ exp	tok_per_sec	vram_peak_mb	n_ctx	type_k	type_v	flash_attn	n_gpu_layers	n_batch
 52	11.729	7807	512	q8_0	q8_0	True	16	256	256	10	discard	n_gpu=16, batch=256/256, q8_0 KV
 53	10.655	7693	512	q8_0	q4_0	True	16	32	32	10	discard	asymmetric q8_0/q4_0, n_gpu=16
 54	0.000	0	512	q8_0	q4_0	True	18	32	32	10	OOM	asym q8_0/q4_0 n_gpu=18 — OOM
-55	11.793	7703	1024	q8_0	q8_0	True	16	32	32	10	keep	n_gpu=16, q8_0 KV, n_ctx=1024 — context push
-56	10.753	7707	2048	q8_0	q8_0	True	16	32	32	10	keep	n_gpu=16, q8_0 KV, n_ctx=2048 — context push
-57	10.228	7715	4096	q8_0	q8_0	True	16	32	32	10	keep	n_gpu=16, q8_0 KV, n_ctx=4096 — context push
-58	11.638	7733	8192	q8_0	q8_0	True	16	32	32	10	keep	n_gpu=16, q8_0 KV, n_ctx=8192 — context push
-59	11.634	7769	16384	q8_0	q8_0	True	16	32	32	10	keep	n_gpu=16, q8_0 KV, n_ctx=16384 — context push
+55	11.793	7703	1024	q8_0	q8_0	True	16	32	32	10	keep	n_gpu=16, q8_0 KV, n_ctx=1024
+56	10.753	7707	2048	q8_0	q8_0	True	16	32	32	10	keep	n_gpu=16, q8_0 KV, n_ctx=2048
+57	10.228	7715	4096	q8_0	q8_0	True	16	32	32	10	keep	n_gpu=16, q8_0 KV, n_ctx=4096
+58	11.638	7733	8192	q8_0	q8_0	True	16	32	32	10	keep	n_gpu=16, q8_0 KV, n_ctx=8192
+59	11.634	7769	16384	q8_0	q8_0	True	16	32	32	10	keep	n_gpu=16, q8_0 KV, n_ctx=16384

@@ -93,43 +93,24 @@ goal (program.md) → agent decides → modify bench_kv.py → run 256 tokens �
 - `phase3/real-inference` — Real GGUF on RTX 3070 (15 experiments, best: 6.59 tok/s)
 - `phase4/kv-compression` — KV cache compression (ongoing, best: **10.20 tok/s**)
 
-## Roadmap
-
-| Phase | Technique | Status | Best result |
-|-------|-----------|--------|-------------|
-| 3 | llama.cpp parameter tuning | ✅ Done | 6.59 tok/s |
-| 4 | KV block quant (q8_0) + flash attn + GPU layers | ✅ Done | **10.20 tok/s** |
-| 5A | PolarQuant Rust+CUDA (arXiv:2502.02617) | 🔨 Building | — |
-| 5B | QJL Rust+CUDA (arXiv:2406.03482) | 🔨 Building | — |
-| 6 | Async expert prefetch (Apple §3.1) | 📋 Planned | — |
-
-No ceiling. No predicted targets. The autoresearch loop runs until hardware limits are found empirically.
-
 ## Repo Structure
 
 ```
 .
 ├── README.md
 ├── PLAN.md                     # Detailed implementation plan
-├── program.md                  # Autoresearch goal and current phase directive
+├── program.md                  # Autoresearch goal and current phase
 ├── harness.py                  # Fixed benchmark harness (immutable)
-├── bench.py                    # Autoresearch editable (NVMe/RAM phases)
+├── bench.py                    # Autoresearch editable file (NVMe/RAM phases)
 ├── bench_kv.py                 # KV compression experiments (Phase 4)
-├── bench_polarquant.py         # PolarQuant benchmark (Phase 5A)
-├── bench_qjl.py                # QJL benchmark (Phase 5B)
 ├── docs/
 │   ├── architecture.md         # Qwen3.5-35B-A3B architecture breakdown
 │   ├── apple-flash-mapping.md  # Apple paper techniques → MoE expert mapping
-│   ├── kv-compression.md       # KV cache compression: PolarQuant + QJL deep dive
 │   └── hardware-profile.md     # RTX 3070 + NVMe bandwidth measurements
-├── scripts/
-│   ├── polar_kv.py             # PolarQuant Python prototype (correctness verified)
-│   ├── measure_nvme.py         # Benchmark NVMe sequential vs random read
-│   ├── expert_cache.py         # Sliding window expert DRAM cache
-│   └── download_model.py       # Download Qwen3.5-35B-A3B-Q3_K_M GGUF
-└── crates/                     # Phase 5 — Rust+CUDA implementations (in progress)
-    ├── polarquant/             # PolarQuant: Hadamard+polar decomposition CUDA kernel
-    └── qjl/                    # QJL: JL transform + sign-bit quantization CUDA wrapper
+└── scripts/
+    ├── measure_nvme.py          # Benchmark NVMe sequential vs random read
+    ├── expert_cache.py          # Sliding window expert DRAM cache
+    └── download_model.py        # Download Qwen3.5-35B-A3B-Q3_K_M GGUF
 ```
 
 ## Quick Start
@@ -163,9 +144,10 @@ uv run --with llama-cpp-python python bench_kv.py
 
 ## Phase 5 — Rust Crates: PolarQuant + QJL
 
-Pure-Rust CPU implementations of the two KV cache compression algorithms.
-These crates will be compiled to a shared library and called from Python via
-FFI to inject custom KV compression into the llama.cpp inference loop.
+Pure-Rust CPU implementations of the two KV cache compression algorithms
+referenced in Phase 4.  These crates will eventually be compiled to a
+shared library and called from Python via FFI, allowing injection of custom
+KV compression into the llama.cpp inference loop.
 
 ### Crates
 
@@ -177,36 +159,52 @@ crates/
 
 #### `crates/polarquant`
 
-Implements PolarQuant:
-1. **Randomised Hadamard preconditioner** — Walsh-Hadamard transform + random ±1 diagonal.
-2. **Polar decomposition** — splits KV head into radius + (head_dim−1) spherical angles.
-3. **Angle quantization** — configurable `bits` per angle (1–8 bit).
+Implements the PolarQuant algorithm:
+1. **Randomised Hadamard preconditioner** — spreads energy uniformly
+   across KV dimensions before quantization (Walsh-Hadamard transform +
+   random ±1 diagonal).
+2. **Polar decomposition** — splits a KV head vector into a scalar radius
+   and (head\_dim − 1) spherical angles.
+3. **Angle quantization** — packs angles to configurable `bits` per angle
+   (default 4-bit).
 
-Compression: **~7.58× vs f32** (~3.79× vs f16, paper: 3.91×) at head_dim=128, 4-bit.
-Quality: **≥0.85 cosine similarity** at 4-bit.
+Compression ratio: **~7.58× vs f32 baseline** (or ~3.79× vs f16, close to
+the paper's 3.91×) at head\_dim=128, 4-bit.
+
+Cosine similarity after round-trip: **≥0.85** at 4-bit on head\_dim=128.
 
 #### `crates/qjl`
 
-Implements QJL:
-1. **JL projection** — random Gaussian matrix, seeded deterministically.
-2. **Sign quantization** — `sign(AK) ∈ {−1,+1}` stored as `i8`.
-3. **Asymmetric attention estimator** — estimates `Q·K` without full-precision K.
+Implements the QJL (Quantized Johnson-Lindenstrauss) algorithm:
+1. **JL projection** — projects a KV vector from ℝ^d to ℝ^k via a random
+   Gaussian matrix.
+2. **Sign quantization** — stores `sign(AK) ∈ {−1,+1}^k` as `i8` (1 bit
+   effective per dimension).
+3. **Asymmetric attention estimator** — estimates `Q·K` from full-precision
+   query Q and sign-sketch of key K, without materialising K.
 
-Compression: **4–16× depending on sketch_dim**.
-Quality: **Pearson correlation >0.7** between estimated and true attention scores.
+Compression ratio: **4–16× depending on sketch\_dim** (e.g. 8× for
+original\_dim=128, sketch\_dim=64).
 
 ### Build
 
 ```bash
-# CPU-only (no CUDA required)
+# CPU-only build (no CUDA hardware required)
 cargo build --workspace
+
+# Run all tests
 cargo test --workspace
 
-# With CUDA support
+# CUDA build (requires cudarc + CUDA toolkit)
 cargo build --workspace --features cuda
 ```
 
-### Integration Plan
+### Planned llama.cpp Integration
 
-Next step: `crates/kvcache-ffi/` C FFI shim → patch llama.cpp at KV read/write
-boundary → measure vs Phase 4 q8_0 baseline (10.2 tok/s).
+The eventual integration path:
+1. Wrap these crates in a C FFI shim (`crates/kvcache-ffi/`).
+2. Patch llama.cpp to call the shim at the KV cache read/write boundary.
+3. Measure tok/s and VRAM impact vs Phase 4 q8\_0 baseline (10.2 tok/s).
+
+Target: beat Phase 4 VRAM at equal or better tok/s, enabling n\_ctx > 512
+within the RTX 3070 8GB budget.
