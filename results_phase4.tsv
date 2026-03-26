@@ -1,25 +1,60 @@
-exp	tok_per_sec	vram_peak_mb	n_ctx	type_k	type_v	flash_attn	n_gpu_layers	status	description
-1	8.257	3601	512	f16	f16	False	5	baseline	Phase 4 baseline — f16 KV, same config as phase3 best
-2	8.518	3609	512	q8_0	q8_0	True	5	keep	q8_0 KV + flash_attn
-3	7.996	3609	512	f16	f16	True	5	discard	flash_attn alone — slower than baseline
-4	7.499	3609	512	q4_0	q4_0	True	5	discard	q4_0 too aggressive — dequant overhead
-5	8.351	3607	512	q8_0	q4_0	True	5	discard	asymmetric q8_0/q4_0 — q4_0 V is drag
-6	8.203	3607	512	q4_1	q4_1	True	5	discard	q4_1 — worse than q8_0
-7	8.438	3973	512	q8_0	q8_0	True	6	discard	6 GPU layers — slower, more VRAM
-8	8.171	3607	512	q5_1	q5_1	True	5	discard	q5_1 — worse than q8_0
-9	8.608	4349	512	q8_0	q8_0	True	7	keep	7 GPU layers — new best
-10	9.351	4723	512	q8_0	q8_0	True	8	keep	8 GPU layers — big jump
-11	9.604	5099	512	q8_0	q8_0	True	9	keep	9 GPU layers — climbing
-12	9.903	5463	512	q8_0	q8_0	True	10	keep	10 GPU layers — near 10 tok/s!
-13	9.118	5837	512	q8_0	q8_0	True	11	discard	11 GPU layers — regresses
-14	10.200	5463	512	q8_0	q8_0	True	10	keep	n_batch=32, n_ubatch=32 tuning — new best
-15	8.852	5467	1024	q8_0	q8_0	True	10	discard	n_ctx=1024, q8_0 KV, n_gpu=10
-16	8.807	5471	2048	q8_0	q8_0	True	10	discard	n_ctx=2048, q8_0 KV, n_gpu=10
-17	9.712	5477	4096	q8_0	q8_0	True	10	discard	n_ctx=4096, q8_0 KV, n_gpu=10
-18	8.355	5491	8192	q8_0	q8_0	True	10	discard	n_ctx=8192, q8_0 KV, n_gpu=10
-19	7.744	5463	512	q4_0	q4_0	True	10	discard	q4_0 KV, n_gpu=10, n_ctx=512
-20	8.347	6211	512	q4_0	q4_0	True	12	discard	q4_0 KV, n_gpu=12, n_ctx=512
-21	9.856	6949	512	q4_0	q4_0	True	14	discard	q4_0 KV, n_gpu=14, n_ctx=512
-22	9.309	6211	512	q8_0	q8_0	True	12	discard	n_gpu=12, q8_0 KV, n_ctx=512
-23	9.677	6953	512	q8_0	q8_0	True	14	discard	n_gpu=14, q8_0 KV, n_ctx=512
-24	10.240	7699	512	q8_0	q8_0	True	16	keep	n_gpu=16, q8_0 KV, n_ctx=512 — NEW BEST
+exp	tok_per_sec	vram_peak_mb	n_ctx	type_k	type_v	flash_attn	n_gpu_layers	n_batch	n_ubatch	n_threads	status	description
+1	8.257	3601	512	f16	f16	False	5	512	512	10	baseline	Phase 4 baseline — f16 KV, same config as phase3 best
+2	8.518	3609	512	q8_0	q8_0	True	5	512	512	10	keep	q8_0 KV + flash_attn
+3	7.996	3609	512	f16	f16	True	5	512	512	10	discard	flash_attn alone — slower than baseline
+4	7.499	3609	512	q4_0	q4_0	True	5	512	512	10	discard	q4_0 too aggressive — dequant overhead
+5	8.351	3607	512	q8_0	q4_0	True	5	512	512	10	discard	asymmetric q8_0/q4_0 — q4_0 V is drag
+6	8.203	3607	512	q4_1	q4_1	True	5	512	512	10	discard	q4_1 — worse than q8_0
+7	8.438	3973	512	q8_0	q8_0	True	6	512	512	10	discard	6 GPU layers — slower, more VRAM
+8	8.171	3607	512	q5_1	q5_1	True	5	512	512	10	discard	q5_1 — worse than q8_0
+9	8.608	4349	512	q8_0	q8_0	True	7	512	512	10	keep	7 GPU layers — new best
+10	9.351	4723	512	q8_0	q8_0	True	8	512	512	10	keep	8 GPU layers — big jump
+11	9.604	5099	512	q8_0	q8_0	True	9	512	512	10	keep	9 GPU layers — climbing
+12	9.903	5463	512	q8_0	q8_0	True	10	512	512	10	keep	10 GPU layers — near 10 tok/s!
+13	9.118	5837	512	q8_0	q8_0	True	11	512	512	10	discard	11 GPU layers — regresses
+14	10.200	5463	512	q8_0	q8_0	True	10	32	32	10	keep	n_batch=32, n_ubatch=32 tuning — new best
+15	8.852	5467	1024	q8_0	q8_0	True	10	32	32	10	discard	n_ctx=1024, q8_0 KV, n_gpu=10
+16	8.807	5471	2048	q8_0	q8_0	True	10	32	32	10	discard	n_ctx=2048, q8_0 KV, n_gpu=10
+17	9.712	5477	4096	q8_0	q8_0	True	10	32	32	10	discard	n_ctx=4096, q8_0 KV, n_gpu=10
+18	8.355	5491	8192	q8_0	q8_0	True	10	32	32	10	discard	n_ctx=8192, q8_0 KV, n_gpu=10
+19	7.744	5463	512	q4_0	q4_0	True	10	32	32	10	discard	q4_0 KV, n_gpu=10, n_ctx=512
+20	8.347	6211	512	q4_0	q4_0	True	12	32	32	10	discard	q4_0 KV, n_gpu=12, n_ctx=512
+21	9.856	6949	512	q4_0	q4_0	True	14	32	32	10	discard	q4_0 KV, n_gpu=14, n_ctx=512
+22	9.309	6211	512	q8_0	q8_0	True	12	32	32	10	discard	n_gpu=12, q8_0 KV, n_ctx=512
+23	9.677	6953	512	q8_0	q8_0	True	14	32	32	10	discard	n_gpu=14, q8_0 KV, n_ctx=512
+24	10.240	7699	512	q8_0	q8_0	True	16	32	32	10	keep	n_gpu=16, q8_0 KV, n_ctx=512
+25	7.953	5463	512	q8_0	q8_0	True	10	32	32	6	discard	n_threads=6, n_gpu=10, q8_0 KV
+26	7.760	5468	512	q8_0	q8_0	True	10	32	32	8	discard	n_threads=8, n_gpu=10, q8_0 KV
+27	8.442	5468	512	q8_0	q8_0	True	10	32	32	12	discard	n_threads=12, n_gpu=10, q8_0 KV
+28	7.166	5468	512	q8_0	q8_0	True	10	32	32	14	discard	n_threads=14, n_gpu=10, q8_0 KV
+29	8.489	5468	1024	q4_0	q4_0	True	10	32	32	10	discard	q4_0 KV, n_ctx=1024, n_gpu=10
+30	7.774	5472	2048	q4_0	q4_0	True	10	32	32	10	discard	q4_0 KV, n_ctx=2048, n_gpu=10
+31	0.000	0	512	q8_0	q8_0	True	18	32	32	10	OOM	n_gpu=18, q8_0 KV — OOM
+32	0.000	0	1024	q8_0	q8_0	True	16	32	32	10	OOM	n_gpu=16 n_ctx=1024, q8_0 — OOM (transient VRAM pressure)
+33	3.161	7702	512	q8_0	q8_0	True	16	32	32	16	discard	n_gpu=16, n_threads=16, q8_0 KV
+34	9.446	5464	512	q4_0	q4_0	True	10	32	32	10	discard	q4_0 KV, n_gpu=10 (retest isolated)
+35	11.038	6949	512	q4_0	q4_0	True	14	32	32	10	keep	q4_0 KV, n_gpu=14 — NEW BEST
+36	10.844	7697	512	q4_0	q4_0	True	16	32	32	10	discard	q4_0 KV, n_gpu=16
+37	0.000	0	512	q4_0	q4_0	True	18	32	32	10	OOM	q4_0 n_gpu=18 — OOM
+38	10.724	7701	1024	q4_0	q4_0	True	16	32	32	10	discard	q4_0 KV, n_gpu=16, n_ctx=1024
+39	11.785	7703	2048	q4_0	q4_0	True	16	32	32	10	keep	q4_0 KV, n_gpu=16, n_ctx=2048 — NEW BEST
+40	10.312	7707	4096	q4_0	q4_0	True	16	32	32	10	discard	q4_0 KV, n_gpu=16, n_ctx=4096
+41	11.547	7713	8192	q4_0	q4_0	True	16	32	32	10	discard	q4_0 KV, n_gpu=16, n_ctx=8192
+42	10.766	6953	1024	q4_0	q4_0	True	14	32	32	10	discard	q4_0 KV, n_gpu=14, n_ctx=1024
+43	10.108	6955	2048	q4_0	q4_0	True	14	32	32	10	discard	q4_0 KV, n_gpu=14, n_ctx=2048
+44	10.829	6959	4096	q4_0	q4_0	True	14	32	32	10	discard	q4_0 KV, n_gpu=14, n_ctx=4096
+45	9.973	6965	8192	q4_0	q4_0	True	14	32	32	10	discard	q4_0 KV, n_gpu=14, n_ctx=8192
+46	11.850	7703	512	q8_0	q8_0	True	16	64	64	10	keep	n_gpu=16, batch=64/64, q8_0 KV — NEW BEST
+47	11.624	7713	512	q8_0	q8_0	True	16	128	128	10	discard	n_gpu=16, batch=128/128, q8_0 KV
+48	11.680	7571	512	q8_0	q8_0	True	16	16	16	10	discard	n_gpu=16, batch=16/16, q8_0 KV
+49	11.632	7701	512	q8_0	q8_0	True	16	64	32	10	discard	n_gpu=16, batch=64/32, q8_0 KV
+50	10.648	7701	512	q8_0	q8_0	True	16	128	32	10	discard	n_gpu=16, batch=128/32, q8_0 KV
+51	11.595	7701	512	q8_0	q8_0	True	16	256	32	10	discard	n_gpu=16, batch=256/32, q8_0 KV
+52	11.729	7807	512	q8_0	q8_0	True	16	256	256	10	discard	n_gpu=16, batch=256/256, q8_0 KV
+53	10.655	7693	512	q8_0	q4_0	True	16	32	32	10	discard	asymmetric q8_0/q4_0, n_gpu=16
+54	0.000	0	512	q8_0	q4_0	True	18	32	32	10	OOM	asym q8_0/q4_0 n_gpu=18 — OOM
+55	11.793	7703	1024	q8_0	q8_0	True	16	32	32	10	keep	n_gpu=16, q8_0 KV, n_ctx=1024
+56	10.753	7707	2048	q8_0	q8_0	True	16	32	32	10	keep	n_gpu=16, q8_0 KV, n_ctx=2048
+57	10.228	7715	4096	q8_0	q8_0	True	16	32	32	10	keep	n_gpu=16, q8_0 KV, n_ctx=4096
+58	11.638	7733	8192	q8_0	q8_0	True	16	32	32	10	keep	n_gpu=16, q8_0 KV, n_ctx=8192
+59	11.634	7769	16384	q8_0	q8_0	True	16	32	32	10	keep	n_gpu=16, q8_0 KV, n_ctx=16384
