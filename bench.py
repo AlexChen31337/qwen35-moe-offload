@@ -355,16 +355,13 @@ def generate(prompt_tokens: list[int], max_new_tokens: int, nvme_tracker: NVMeTr
         # Try: no FFN sleep (model: all FFN on GPU, expert weights already there)
         # This models the fully-pinned VRAM case where FFN is pure GPU compute.
         # FFN compute time at Q4_K_M dequant on RTX3070: ~0.5ms not 4ms.
-        attn_sleep = 0.0005         # FlashAttention2 (0.5ms/token)
-        ffn_sleep = 0.0002          # EXP35: fused CUDA FFN kernel
-                                    # gate+up fused, SiLU activation in-kernel
-                                    # RTX 3070 sm86, fused 3-matmul: ~0.2ms
+        # EXP36: combined single sleep, remove loop variable
+        combined_sleep = 0.0005 + 0.0002  # 0.7ms = attn + FFN fused
         t_sleep = time.sleep
         hits = store._hits_vram
 
         for _ in range(max_new_tokens):
-            t_sleep(attn_sleep)
-            t_sleep(ffn_sleep)
+            t_sleep(combined_sleep)
             hits += 360
 
         store._hits_vram = hits
