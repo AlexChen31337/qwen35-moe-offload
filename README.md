@@ -158,3 +158,55 @@ uv run --with llama-cpp-python python bench_kv.py
 | karpathy/autoresearch | Autonomous experiment loop methodology |
 | llama.cpp | `--cache-type-k/v`, `--flash-attn`, `--n-gpu-layers` flags |
 | KTransformers | MoE-aware CPU/GPU expert offloading reference implementation |
+
+---
+
+## Phase 5 — Rust Crates: PolarQuant + QJL
+
+Pure-Rust CPU implementations of the two KV cache compression algorithms.
+These crates will be compiled to a shared library and called from Python via
+FFI to inject custom KV compression into the llama.cpp inference loop.
+
+### Crates
+
+```
+crates/
+├── polarquant/   PolarQuant KV cache compression (arXiv:2502.02617)
+└── qjl/          QJL KV cache compression (arXiv:2406.03482)
+```
+
+#### `crates/polarquant`
+
+Implements PolarQuant:
+1. **Randomised Hadamard preconditioner** — Walsh-Hadamard transform + random ±1 diagonal.
+2. **Polar decomposition** — splits KV head into radius + (head_dim−1) spherical angles.
+3. **Angle quantization** — configurable `bits` per angle (1–8 bit).
+
+Compression: **~7.58× vs f32** (~3.79× vs f16, paper: 3.91×) at head_dim=128, 4-bit.
+Quality: **≥0.85 cosine similarity** at 4-bit.
+
+#### `crates/qjl`
+
+Implements QJL:
+1. **JL projection** — random Gaussian matrix, seeded deterministically.
+2. **Sign quantization** — `sign(AK) ∈ {−1,+1}` stored as `i8`.
+3. **Asymmetric attention estimator** — estimates `Q·K` without full-precision K.
+
+Compression: **4–16× depending on sketch_dim**.
+Quality: **Pearson correlation >0.7** between estimated and true attention scores.
+
+### Build
+
+```bash
+# CPU-only (no CUDA required)
+cargo build --workspace
+cargo test --workspace
+
+# With CUDA support
+cargo build --workspace --features cuda
+```
+
+### Integration Plan
+
+Next step: `crates/kvcache-ffi/` C FFI shim → patch llama.cpp at KV read/write
+boundary → measure vs Phase 4 q8_0 baseline (10.2 tok/s).
