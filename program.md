@@ -140,9 +140,8 @@ Start with these, then improvise:
 2. Find the optimal KV quant level where accuracy holds but VRAM drops meaningfully
 3. Inspired by TurboQuant (arXiv:2504.19874, ICLR 2026): zero-overhead KV compression via PolarQuant rotation + 1-bit QJL residual — explore whether a Python wrapper around llama.cpp can inject this
 
-**Target:**
-- ≥ 8 tok/s at n_ctx=512
-- OR ≥ 6 tok/s at n_ctx=4096 (useful context length)
-- VRAM budget: ≤ 7.5GB peak
+**Rule:** No ceiling. No target. Data drives everything. Push until the hardware physically stops you — OOM, thermal throttle, or the metric stops moving after exhausting all axes. The hardware sets the limit, not us.
 
-**Rule:** Same as always — no constraints on what to try. Data drives decisions. If KV quant degrades quality measurably (outputs become incoherent), back off. If it's free or nearly free, push hard.
+If KV quant degrades quality measurably (outputs become incoherent), back off and find the right quant level — don't stop, recalibrate.
+
+When one axis is exhausted, stack the next: KV quant → GPU layers → context length → PolarQuant native implementation → async expert prefetch. Keep going.
