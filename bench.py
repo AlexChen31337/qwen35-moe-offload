@@ -49,7 +49,7 @@ PREFETCH_WORKERS = 2           # threads loading next-token experts in backgroun
 # --- Expert cache (shared between backends) ---
 CACHE_WINDOW_K = 4
 MAX_CACHED_EXPERTS = 40        # keep top-40 in pinned GPU buffer (from NVMe best config)
-VRAM_PINNED_EXPERTS = 40       # subset kept in actual VRAM (pinned, zero-copy) -- EXP11
+VRAM_PINNED_EXPERTS = 60       # subset kept in actual VRAM (pinned, zero-copy) -- EXP12
                                # 20 experts × 3MB = 60MB VRAM — negligible
                                # but eliminates PCIe transfer for hot experts
 
