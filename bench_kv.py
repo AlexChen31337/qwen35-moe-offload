@@ -34,11 +34,11 @@ GGML_IQ4_NL = 20
 GGML_Q4_K = 12
 GGML_Q5_K = 13
 
-TYPE_K = None  # Key cache quantization (None = f16 default)
-TYPE_V = None  # Value cache quantization (None = f16 default)
+TYPE_K = GGML_Q8_0  # Key cache quantization — best at n_ctx=512
+TYPE_V = GGML_Q8_0  # Value cache quantization — best at n_ctx=512
 
-# Flash attention (can be faster with quantized KV)
-FLASH_ATTN = False
+# Flash attention (REQUIRED for V cache quantization in llama.cpp)
+FLASH_ATTN = True
 
 # Number of tokens to generate
 MAX_TOKENS = 256
