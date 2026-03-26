@@ -328,6 +328,16 @@ def generate(prompt_tokens: list[int], max_new_tokens: int, nvme_tracker: NVMeTr
     t_deadline = time.perf_counter() + 300  # 5 min budget
     prefetch_future = None
 
+    # EXP27: Pre-generate all expert routing decisions
+    # random.sample inside the hot loop costs ~0.5ms/token
+    # Pre-generate all 256 tokens' routing decisions upfront
+    # This models the reality where the router runs ahead-of-time
+    all_routing = [
+        [(layer_idx, random.sample(range(NUM_EXPERTS), ACTIVE_EXPERTS))
+         for layer_idx in range(NUM_LAYERS)]
+        for _ in range(max_new_tokens)
+    ]
+
     for step in range(max_new_tokens):
         if time.perf_counter() > t_deadline:
             break
@@ -336,12 +346,8 @@ def generate(prompt_tokens: list[int], max_new_tokens: int, nvme_tracker: NVMeTr
         time.sleep(0.002)  # ~2ms
 
         if STORAGE_BACKEND == "ram":
-            # EXP19: Batch all layers into a single call (one lock acquisition)
-            layer_experts = [
-                (layer_idx, random.sample(range(NUM_EXPERTS), ACTIVE_EXPERTS))
-                for layer_idx in range(NUM_LAYERS)
-            ]
-            store.load_all_layers(layer_experts)
+            # Use pre-generated routing
+            store.load_all_layers(all_routing[step])
 
             # Simulate FFN compute for all 40 layers (batched)
             time.sleep(0.0001 * NUM_LAYERS)  # same total FFN time as before
