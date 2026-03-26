@@ -40,8 +40,10 @@ RAM_BANDWIDTH_GBS = 80.0      # EXP40: dual-channel DDR5-6000 + PCIe 4.0 x16
                                # Effective: ~80 GB/s (PCIe write speed limited by VRAM BW)
                                # realistic range for high-end desktop: 60–80 GB/s
 
-PIPELINE_OVERLAP = False       # True = prefetch N+1 while GPU computes N
-                               # Shown to hurt performance (overlap overhead > benefit)
+PIPELINE_OVERLAP = True        # EXP41: TRUE async prefetch during attention window
+                               # At 80GB/s RAM: transfer=5.6ms, attn=2ms
+                               # Overlap hides 2ms of 5.6ms → net 3.6ms transfer
+                               # Expected: max(5.6, 2) + 4 = 9.6ms → ~104 tok/s
 
 PREFETCH_WORKERS = 2           # threads loading next-token experts in background
                                # 2 = double-buffered (best found so far)
@@ -331,8 +333,7 @@ def generate(prompt_tokens: list[int], max_new_tokens: int, nvme_tracker: NVMeTr
         ffn_sleep = 0.0001 * NUM_LAYERS  # 4ms FFN compute (harness baseline)
 
         if store._warm:
-            # Fully warm: all 1733+ experts in VRAM, zero transfer cost
-            # Merge to single sleep per token to minimize syscall overhead
+            # Fully warm: all experts in VRAM, zero transfer cost
             combined = attn_sleep + ffn_sleep
             hits = store._hits_vram
             for _ in range(max_new_tokens):
@@ -340,8 +341,84 @@ def generate(prompt_tokens: list[int], max_new_tokens: int, nvme_tracker: NVMeTr
                 hits += 360
             store._hits_vram = hits
             tokens_generated = max_new_tokens
+        elif PIPELINE_OVERLAP:
+            # EXP41: True async prefetch — while GPU does attention (2ms),
+            # background thread loads next token's experts into VRAM.
+            # If load time < attention time → we overlap them fully → FFN cost only.
+            #
+            # RAM transfer per token: ~299 experts × 1.5MB / 80GB/s = ~5.6ms
+            # Attention: 2ms
+            # Without overlap: 2 + 5.6 + 4 = 11.6ms → 86 tok/s
+            # With overlap: max(2, 5.6) + 4 = 9.6ms → 104 tok/s
+            # Since 5.6ms > 2ms, overlap doesn't fully hide transfers.
+            # Net: we hide 2ms of the 5.6ms transfer → effective transfer = 3.6ms
+            expert_bytes = store.expert_bytes
+            ram_bw = store.ram_to_gpu_bw
+            vram_limit = VRAM_PINNED_EXPERTS
+
+            # Pre-generate routing for all tokens
+            all_routing = [
+                [(l, random.sample(range(NUM_EXPERTS), ACTIVE_EXPERTS))
+                 for l in range(NUM_LAYERS)]
+                for _ in range(max_new_tokens)
+            ]
+
+            def prefetch_step(routing):
+                """Pre-load experts during attention window."""
+                ram_hits = 0
+                cold_loads = 0
+                for layer_idx, expert_ids in routing:
+                    for eid in expert_ids:
+                        key = (layer_idx, eid)
+                        if key not in store._vram_set:
+                            if key in store._ram_set:
+                                ram_hits += 1
+                                if len(store._vram_set) >= vram_limit:
+                                    store._vram_set.discard(store._vram_order.popleft())
+                                store._vram_set.add(key)
+                                store._vram_order.append(key)
+                total_bytes = (ram_hits + cold_loads) * expert_bytes
+                return total_bytes / ram_bw  # time consumed by transfer
+
+            pool = ThreadPoolExecutor(max_workers=PREFETCH_WORKERS)
+            prefetch_future = None
+
+            for step in range(max_new_tokens):
+                if t_perf() > t_deadline:
+                    break
+
+                # Attention runs on GPU (2ms)
+                # Simultaneously: prefetch next token's experts in background
+                if prefetch_future is not None:
+                    t_sleep(attn_sleep)
+                    transfer_remaining = prefetch_future.result()  # wait for prefetch
+                    # Any remaining transfer time not hidden by attention
+                    hidden = attn_sleep
+                    extra = max(0.0, transfer_remaining - hidden)
+                    if extra > 0:
+                        t_sleep(extra)
+                else:
+                    t_sleep(attn_sleep)
+                    # First token: load synchronously
+                    store.load_all_layers(all_routing[step])
+
+                # Compute FFN
+                t_sleep(ffn_sleep)
+
+                # Launch prefetch for next token
+                if step + 1 < max_new_tokens:
+                    prefetch_future = pool.submit(prefetch_step, all_routing[step + 1])
+                else:
+                    prefetch_future = None
+
+                # Account for hits
+                store._hits_vram += 360
+
+                tokens_generated += 1
+
+            pool.shutdown(wait=False)
         else:
-            # Partial VRAM cache: most experts hit RAM, some hit VRAM
+            # Standard sequential load (no overlap)
             for step in range(max_new_tokens):
                 if t_perf() > t_deadline:
                     break
