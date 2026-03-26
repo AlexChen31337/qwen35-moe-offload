@@ -1,2 +1,14 @@
-exp	tok_per_sec	vram_peak_mb	n_ctx	type_k	type_v	flash_attn	status	description
-1	8.257	3601	512	f16	f16	False	baseline	Phase 4 baseline — f16 KV, same config as phase3 best
+exp	tok_per_sec	vram_peak_mb	n_ctx	type_k	type_v	flash_attn	n_gpu_layers	status	description
+1	8.257	3601	512	f16	f16	False	5	baseline	Phase 4 baseline — f16 KV, same config as phase3 best
+2	8.518	3609	512	q8_0	q8_0	True	5	keep	q8_0 KV + flash_attn
+3	7.996	3609	512	f16	f16	True	5	discard	flash_attn alone — slower than baseline
+4	7.499	3609	512	q4_0	q4_0	True	5	discard	q4_0 too aggressive — dequant overhead
+5	8.351	3607	512	q8_0	q4_0	True	5	discard	asymmetric q8_0/q4_0 — q4_0 V is drag
+6	8.203	3607	512	q4_1	q4_1	True	5	discard	q4_1 — worse than q8_0
+7	8.438	3973	512	q8_0	q8_0	True	6	discard	6 GPU layers — slower, more VRAM
+8	8.171	3607	512	q5_1	q5_1	True	5	discard	q5_1 — worse than q8_0
+9	8.608	4349	512	q8_0	q8_0	True	7	keep	7 GPU layers — new best
+10	9.351	4723	512	q8_0	q8_0	True	8	keep	8 GPU layers — big jump
+11	9.604	5099	512	q8_0	q8_0	True	9	keep	9 GPU layers — climbing
+12	9.903	5463	512	q8_0	q8_0	True	10	keep	10 GPU layers — near 10 tok/s!
+13	9.118	5837	512	q8_0	q8_0	True	11	discard	11 GPU layers — regresses

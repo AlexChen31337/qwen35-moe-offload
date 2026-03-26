@@ -16,7 +16,7 @@ from pathlib import Path
 MODEL_PATH = "./models/Qwen3.5-35B-A3B-Q3_K_M.gguf"
 
 # Phase 3 best config
-N_GPU_LAYERS = 5
+N_GPU_LAYERS = 10
 N_CTX = 512
 N_THREADS = 10
 N_BATCH = 64
@@ -34,17 +34,25 @@ GGML_IQ4_NL = 20
 GGML_Q4_K = 12
 GGML_Q5_K = 13
 
-TYPE_K = GGML_Q8_0  # Key cache quantization — best at n_ctx=512
-TYPE_V = GGML_Q8_0  # Value cache quantization — best at n_ctx=512
+TYPE_K = GGML_Q8_0  # Best KV quant
+TYPE_V = GGML_Q8_0
 
 # Flash attention (REQUIRED for V cache quantization in llama.cpp)
 FLASH_ATTN = True
 
+# Op offload — offload host tensor operations to GPU
+OP_OFFLOAD = False
+
+# Sliding window attention — use full KV for SWA layers
+SWA_FULL = False
+
 # Number of tokens to generate
 MAX_TOKENS = 256
 
-# Test prompt
-PROMPT = "Explain the architecture of Mixture of Experts neural networks in detail:"
+# Test prompt — long version to stress KV cache at high n_ctx
+PROMPT_SHORT = "Explain the architecture of Mixture of Experts neural networks in detail:"
+PROMPT_LONG = """The following is a comprehensive analysis of modern neural network architectures. """ * 200  # ~1000 tokens
+PROMPT = PROMPT_SHORT  # Change to PROMPT_LONG for KV stress test
 
 # ---------------------------------------------------------------------------
 # Measure VRAM
@@ -97,6 +105,10 @@ def run():
         kwargs["type_v"] = TYPE_V
     if FLASH_ATTN:
         kwargs["flash_attn"] = True
+    if OP_OFFLOAD:
+        kwargs["op_offload"] = True
+    if SWA_FULL:
+        kwargs["swa_full"] = True
 
     t_load = time.perf_counter()
     llm = Llama(**kwargs)
