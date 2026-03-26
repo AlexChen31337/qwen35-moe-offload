@@ -41,7 +41,7 @@ RAM_BANDWIDTH_GBS = 30.0      # DDR5 effective bandwidth to GPU (PCIe 4.0 ceilin
 PIPELINE_OVERLAP = True        # True = prefetch N+1 while GPU computes N -- EXP7
                                # This is the core innovation — hide RAM latency
 
-PREFETCH_WORKERS = 4           # threads loading next-token experts in background -- EXP8
+PREFETCH_WORKERS = 2           # threads loading next-token experts in background -- EXP9
                                # 1 = single prefetch thread
                                # 2 = double-buffered (recommended)
                                # 4 = aggressive, may starve GPU
@@ -49,7 +49,7 @@ PREFETCH_WORKERS = 4           # threads loading next-token experts in backgroun
 # --- Expert cache (shared between backends) ---
 CACHE_WINDOW_K = 4
 MAX_CACHED_EXPERTS = 40        # keep top-40 in pinned GPU buffer (from NVMe best config)
-VRAM_PINNED_EXPERTS = 20       # subset kept in actual VRAM (pinned, zero-copy)
+VRAM_PINNED_EXPERTS = 5        # subset kept in actual VRAM (pinned, zero-copy) -- EXP9
                                # 20 experts × 3MB = 60MB VRAM — negligible
                                # but eliminates PCIe transfer for hot experts
 
