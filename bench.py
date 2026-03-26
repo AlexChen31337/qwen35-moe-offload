@@ -33,15 +33,15 @@ STORAGE_BACKEND = "ram"       # "nvme" | "ram" — this is the key variable
                                # "nvme" = original NVMe path (baseline)
 
 # --- RAM backend config ---
-RAM_BANDWIDTH_GBS = 50.0      # DDR5 effective bandwidth to GPU (PCIe 4.0 ceiling) -- EXP2
+RAM_BANDWIDTH_GBS = 30.0      # DDR5 effective bandwidth to GPU (PCIe 4.0 ceiling) -- EXP3
                                # realistic range: 20–50 GB/s
                                # 50 = DDR5-5600 best case
                                # 20 = DDR4-3200 + PCIe 3.0 mixed path
 
-PIPELINE_OVERLAP = True        # True = prefetch N+1 while GPU computes N -- EXP2
+PIPELINE_OVERLAP = True        # True = prefetch N+1 while GPU computes N -- EXP3
                                # This is the core innovation — hide RAM latency
 
-PREFETCH_WORKERS = 2           # threads loading next-token experts in background -- EXP2
+PREFETCH_WORKERS = 2           # threads loading next-token experts in background -- EXP3
                                # 1 = single prefetch thread
                                # 2 = double-buffered (recommended)
                                # 4 = aggressive, may starve GPU
