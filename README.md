@@ -139,3 +139,72 @@ uv run --with llama-cpp-python python bench_kv.py
 | karpathy/autoresearch | Autonomous experiment loop methodology |
 | llama.cpp | `--cache-type-k/v`, `--flash-attn`, `--n-gpu-layers` flags |
 | KTransformers | MoE-aware CPU/GPU expert offloading reference implementation |
+
+---
+
+## Phase 5 — Rust Crates: PolarQuant + QJL
+
+Pure-Rust CPU implementations of the two KV cache compression algorithms
+referenced in Phase 4.  These crates will eventually be compiled to a
+shared library and called from Python via FFI, allowing injection of custom
+KV compression into the llama.cpp inference loop.
+
+### Crates
+
+```
+crates/
+├── polarquant/   PolarQuant KV cache compression (arXiv:2502.02617)
+└── qjl/          QJL KV cache compression (arXiv:2406.03482)
+```
+
+#### `crates/polarquant`
+
+Implements the PolarQuant algorithm:
+1. **Randomised Hadamard preconditioner** — spreads energy uniformly
+   across KV dimensions before quantization (Walsh-Hadamard transform +
+   random ±1 diagonal).
+2. **Polar decomposition** — splits a KV head vector into a scalar radius
+   and (head\_dim − 1) spherical angles.
+3. **Angle quantization** — packs angles to configurable `bits` per angle
+   (default 4-bit).
+
+Compression ratio: **~7.58× vs f32 baseline** (or ~3.79× vs f16, close to
+the paper's 3.91×) at head\_dim=128, 4-bit.
+
+Cosine similarity after round-trip: **≥0.85** at 4-bit on head\_dim=128.
+
+#### `crates/qjl`
+
+Implements the QJL (Quantized Johnson-Lindenstrauss) algorithm:
+1. **JL projection** — projects a KV vector from ℝ^d to ℝ^k via a random
+   Gaussian matrix.
+2. **Sign quantization** — stores `sign(AK) ∈ {−1,+1}^k` as `i8` (1 bit
+   effective per dimension).
+3. **Asymmetric attention estimator** — estimates `Q·K` from full-precision
+   query Q and sign-sketch of key K, without materialising K.
+
+Compression ratio: **4–16× depending on sketch\_dim** (e.g. 8× for
+original\_dim=128, sketch\_dim=64).
+
+### Build
+
+```bash
+# CPU-only build (no CUDA hardware required)
+cargo build --workspace
+
+# Run all tests
+cargo test --workspace
+
+# CUDA build (requires cudarc + CUDA toolkit)
+cargo build --workspace --features cuda
+```
+
+### Planned llama.cpp Integration
+
+The eventual integration path:
+1. Wrap these crates in a C FFI shim (`crates/kvcache-ffi/`).
+2. Patch llama.cpp to call the shim at the KV cache read/write boundary.
+3. Measure tok/s and VRAM impact vs Phase 4 q8\_0 baseline (10.2 tok/s).
+
+Target: beat Phase 4 VRAM at equal or better tok/s, enabling n\_ctx > 512
+within the RTX 3070 8GB budget.

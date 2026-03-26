@@ -11,3 +11,6 @@ results/*.jsonl
 !results/.gitkeep
 experiments/*/
 !experiments/*/.gitkeep
+
+# Rust build artifacts
+target/

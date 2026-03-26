@@ -12,3 +12,14 @@ exp	tok_per_sec	vram_peak_mb	n_ctx	type_k	type_v	flash_attn	n_gpu_layers	status	
 11	9.604	5099	512	q8_0	q8_0	True	9	keep	9 GPU layers — climbing
 12	9.903	5463	512	q8_0	q8_0	True	10	keep	10 GPU layers — near 10 tok/s!
 13	9.118	5837	512	q8_0	q8_0	True	11	discard	11 GPU layers — regresses
+14	10.200	5463	512	q8_0	q8_0	True	10	keep	n_batch=32, n_ubatch=32 tuning — new best
+15	8.852	5467	1024	q8_0	q8_0	True	10	discard	n_ctx=1024, q8_0 KV, n_gpu=10
+16	8.807	5471	2048	q8_0	q8_0	True	10	discard	n_ctx=2048, q8_0 KV, n_gpu=10
+17	9.712	5477	4096	q8_0	q8_0	True	10	discard	n_ctx=4096, q8_0 KV, n_gpu=10
+18	8.355	5491	8192	q8_0	q8_0	True	10	discard	n_ctx=8192, q8_0 KV, n_gpu=10
+19	7.744	5463	512	q4_0	q4_0	True	10	discard	q4_0 KV, n_gpu=10, n_ctx=512
+20	8.347	6211	512	q4_0	q4_0	True	12	discard	q4_0 KV, n_gpu=12, n_ctx=512
+21	9.856	6949	512	q4_0	q4_0	True	14	discard	q4_0 KV, n_gpu=14, n_ctx=512
+22	9.309	6211	512	q8_0	q8_0	True	12	discard	n_gpu=12, q8_0 KV, n_ctx=512
+23	9.677	6953	512	q8_0	q8_0	True	14	discard	n_gpu=14, q8_0 KV, n_ctx=512
+24	10.240	7699	512	q8_0	q8_0	True	16	keep	n_gpu=16, q8_0 KV, n_ctx=512 — NEW BEST

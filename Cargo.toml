@@ -1,0 +1,3 @@
+[workspace]
+members = ["crates/polarquant", "crates/qjl"]
+resolver = "2"

@@ -1,0 +1,58 @@
+{
+  "standalone": [
+    {
+      "n_bits": 3,
+      "compression_ratio": 5.16,
+      "mean_cosine_sim": 0.5798,
+      "encode_ms_per_100vec": 161.31,
+      "decode_ms_per_100vec": 13.63,
+      "bytes_per_vector": 50,
+      "fp16_bytes_per_vector": 256
+    },
+    {
+      "n_bits": 4,
+      "compression_ratio": 3.91,
+      "mean_cosine_sim": 0.8901,
+      "encode_ms_per_100vec": 164.63,
+      "decode_ms_per_100vec": 14.77,
+      "bytes_per_vector": 66,
+      "fp16_bytes_per_vector": 256
+    },
+    {
+      "n_bits": 5,
+      "compression_ratio": 3.15,
+      "mean_cosine_sim": 0.973,
+      "encode_ms_per_100vec": 164.25,
+      "decode_ms_per_100vec": 16.58,
+      "bytes_per_vector": 82,
+      "fp16_bytes_per_vector": 256
+    },
+    {
+      "n_bits": 8,
+      "compression_ratio": 1.98,
+      "mean_cosine_sim": 0.9996,
+      "encode_ms_per_100vec": 170.74,
+      "decode_ms_per_100vec": 19.7,
+      "bytes_per_vector": 129,
+      "fp16_bytes_per_vector": 256
+    }
+  ],
+  "inference": [
+    {
+      "config": "baseline_q8_0",
+      "error": "'str' object cannot be interpreted as an integer"
+    },
+    {
+      "config": "polar_4bit",
+      "error": "Failed to load model from file: models/Qwen3.5-35B-A3B-Q3_K_M.gguf"
+    },
+    {
+      "config": "polar_3bit",
+      "error": "Failed to load model from file: models/Qwen3.5-35B-A3B-Q3_K_M.gguf"
+    },
+    {
+      "config": "polar_5bit",
+      "error": "Failed to load model from file: models/Qwen3.5-35B-A3B-Q3_K_M.gguf"
+    }
+  ]
+}
