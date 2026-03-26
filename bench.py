@@ -45,9 +45,9 @@ PREFETCH_WORKERS = 2           # threads loading next-token experts in backgroun
 # --- Expert cache (shared between backends) ---
 CACHE_WINDOW_K = 4             # sliding window size
 MAX_CACHED_EXPERTS = 40        # keep top-40 in pinned GPU buffer -- EXP16 best combo
-VRAM_PINNED_EXPERTS = 200      # EXP21: larger VRAM pinned set → more zero-cost hits
-                               # 200 experts × 3MB = 600MB VRAM — still well under 8GB limit
-                               # Hypothesis: more VRAM pins → fewer RAM transfers → higher tok/s
+VRAM_PINNED_EXPERTS = 500      # EXP22: massive VRAM pinned set
+                               # 500 experts × 3MB = 1.5GB VRAM — still OK for RTX 3070 8GB
+                               # Hypothesis: larger set → much higher VRAM hit rate
 
 # --- NVMe backend config (baseline comparison) ---
 READ_ALIGN_BYTES = 524288      # 512KB — from best NVMe config
