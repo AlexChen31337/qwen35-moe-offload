@@ -1,0 +1,6 @@
+exp_id	tok_s	vram_mb	n_ctx	kv_type_k	kv_type_v	flash_attn	n_gpu	n_batch	n_ubatch	label	status	notes
+1	0.000	0	512	q8_0	q8_0	True	16	64	128	baseline_match_p5	crash	Failed to load model
+2	6.503	6953	512	q8_0	q8_0	True	14	64	64	baseline_n14	ok	n_gpu=14, batch=64/64, q8_0 KV, n_ctx=512, flash=1 — wall=6.455tok/s internal=6.503tok/s, gen=64, t_eval=9687.4ms
+3	8.662	7701	512	q8_0	q8_0	True	16	64	64	baseline_n16	ok	n_gpu=16, batch=64/64, q8_0 KV, n_ctx=512, flash=1 — wall=8.637tok/s internal=8.662tok/s, gen=128, t_eval=14661.4ms
+4	6.747	7701	512	q8_0	q8_0	True	16	64	128	baseline_p5_config	ok	n_gpu=16, batch=64/128, q8_0 KV, n_ctx=512, flash=1 — wall=6.737tok/s internal=6.747tok/s, gen=128, t_eval=18823.4ms
+5	7.987	7701	512	q8_0	q8_0	True	16	128	64	batch128_ubatch64	ok	n_gpu=16, batch=128/64, q8_0 KV, n_ctx=512, flash=1 — wall=7.954tok/s internal=7.987tok/s, gen=128, t_eval=15900.7ms
