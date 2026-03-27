@@ -187,3 +187,12 @@ When one axis is exhausted, stack the next: KV quant → GPU layers → context 
 **Reference:** llama.cpp `src/llama-kv-cache.cpp` + `ggml/src/ggml-cuda/quantize.cu` for integration points.
 
 **Goal:** whichever wins the autoresearch benchmark becomes the default KV backend. No pre-declared winner — data decides.
+
+## Phase 6 — Rust Benchmark Runner
+
+Python is prototype-only. The production path:
+1. `crates/bench/` — Rust binary that calls llama.cpp via C FFI (not Python wrapper)
+2. Uses `libllama.so` directly: `llama_load_model_from_file`, `llama_new_context_with_params`, `llama_decode`
+3. No Python overhead in the hot path — pure Rust timing
+4. When `crates/polarquant/` has CUDA kernel: same binary tests both q8_0 and polar_q4 natively
+5. Build: `cargo build --release -p bench --features cuda`
