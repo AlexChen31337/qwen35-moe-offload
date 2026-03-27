@@ -1,0 +1,21 @@
+exp_id	tok_s	compression_ratio	n_ctx	kv_algo	n_gpu	n_batch	label	status	notes
+1	0.000	7.59	512	polarquant_4bit_python	0	0	pq4_py_throughput	ok	Python PolarQuant 4-bit: 305 compress/s, 341 decompress/s, cos_sim=0.891, per_token=1378.97ms (1655% overhead)
+2	0.000	5.16	512	polarquant_6bit_python	0	0	pq6_py_throughput	ok	Python PolarQuant 6-bit: 439 compress/s, 359 decompress/s, cos_sim=0.993, per_token=1410.31ms (1692% overhead)
+3	0.000	3.91	512	polarquant_8bit_python	0	0	pq8_py_throughput	ok	Python PolarQuant 8-bit: 512 compress/s, 359 decompress/s, cos_sim=0.9996, per_token=1399.21ms (1679% overhead)
+4	0.000	8.00	512	qjl_sketch64_python	0	0	qjl64_py_throughput	ok	Python QJL sketch=64: 2259 project/s, Pearson r=0.419, per_token=125.73ms (152% overhead)
+5	0.000	4.00	512	qjl_sketch128_python	0	0	qjl128_py_throughput	ok	Python QJL sketch=128: 1513 project/s, Pearson r=0.635, per_token=174.03ms (211% overhead)
+6	11.657	7.59	512	polarquant_4bit_rust	0	0	pq4_rust_throughput	ok	Rust PolarQuant 4-bit: 150561 compress/s, 416923 decompress/s, cos_sim=0.897, per_token=3.24ms (3.9% overhead), max=11.657 tok/s
+7	11.676	5.16	512	polarquant_6bit_rust	0	0	pq6_rust_throughput	ok	Rust PolarQuant 6-bit: 161102 compress/s, 461618 decompress/s, cos_sim=0.986, per_token=3.10ms (3.8% overhead), max=11.676 tok/s
+8	11.672	3.91	512	polarquant_8bit_rust	0	0	pq8_rust_throughput	ok	Rust PolarQuant 8-bit: 151712 compress/s, 450035 decompress/s, cos_sim=0.992, per_token=3.13ms (3.8% overhead), max=11.672 tok/s
+9	11.252	16.00	512	qjl_sketch32_rust	0	0	qjl32_rust_throughput	ok	Rust QJL sketch=32: 45329 project/s, Pearson r=0.378, per_token=6.32ms (7.7% overhead), max=11.252 tok/s
+10	10.774	8.00	512	qjl_sketch64_rust	0	0	qjl64_rust_throughput	ok	Rust QJL sketch=64: 26986 project/s, Pearson r=0.538, per_token=10.27ms (12.4% overhead), max=10.774 tok/s
+11	9.797	4.00	512	qjl_sketch128_rust	0	0	qjl128_rust_throughput	ok	Rust QJL sketch=128: 11813 project/s, Pearson r=0.648, per_token=19.53ms (23.7% overhead), max=9.797 tok/s
+12	8.185	2.00	512	qjl_sketch256_rust	0	0	qjl256_rust_throughput	ok	Rust QJL sketch=256: 6475 project/s, Pearson r=0.772, per_token=39.63ms (48.0% overhead), max=8.185 tok/s
+13	11.663	14.32	512	polarquant_2bit_rust	0	0	pq2_rust_throughput	ok	Rust PolarQuant 2-bit: 157244 compress/s, cos_sim=0.355 (unusable), per_token=3.20ms, max=11.663 tok/s
+14	11.668	9.92	512	polarquant_3bit_rust	0	0	pq3_rust_throughput	ok	Rust PolarQuant 3-bit: 137310 compress/s, cos_sim=0.675 (marginal), per_token=3.15ms, max=11.668 tok/s
+15	0.000	7.59	512	pq4_quality_1k	0	0	pq4_quality_analysis	ok	PolarQuant 4-bit quality (1000 samples): mean=0.890 std=0.012 min=0.845 p5=0.870 p95=0.910
+16	0.000	5.16	512	pq6_quality_1k	0	0	pq6_quality_analysis	ok	PolarQuant 6-bit quality (1000 samples): mean=0.993 std=0.001 min=0.991 p5=0.992 p95=0.995
+17	0.000	3.91	512	pq8_quality_1k	0	0	pq8_quality_analysis	ok	PolarQuant 8-bit quality (1000 samples): mean=0.9996 std=0.0000 min=0.9994 p5=0.9995 p95=0.9997
+18	11.650	7.59	310000	pq4_hybrid_offload	16	64	hybrid_pq4_310k	theoretical	Hybrid: iq4_nl VRAM + PQ4 RAM offload → ~310K context, ~11.65 tok/s, cos_sim=0.89 for offloaded tokens
+19	11.650	5.16	210000	pq6_hybrid_offload	16	64	hybrid_pq6_210k	theoretical	Hybrid: iq4_nl VRAM + PQ6 RAM offload → ~210K context, ~11.65 tok/s, cos_sim=0.99 for offloaded tokens
+20	0.000	0.00	0	qjl_attn_sketch_study	0	0	qjl_attn_speedup	fail	QJL sketch attention 250-16000x SLOWER than full matmul (even in Rust). Not viable for CPU attention.
