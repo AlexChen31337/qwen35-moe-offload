@@ -84,3 +84,8 @@ exp32		7705	512	q8_0	q8_0	True	16	256	104	p9c2_e32	ok	n_threads=12,gen=256
 88	11.235	7377	384	q8_0	q8_0	True	16	252	94	p9_ctx384_ngen264	ok	n_gpu=16, batch=252/94, q8_0 KV, n_ctx=384, flash=1 — wall=11.140tok/s internal=11.235tok/s, gen=264, t_eval=23408.9ms
 89	11.249	7377	256	q8_0	q8_0	True	16	252	94	p9_ctx256_ngen264	ok	n_gpu=16, batch=252/94, q8_0 KV, n_ctx=256, flash=1 — wall=11.195tok/s internal=11.249tok/s, gen=252, t_eval=22312.4ms
 90	11.814	7377	512	q8_0	q8_0	True	16	250	94	p9_batch250_94_ngen264	ok	n_gpu=16, batch=250/94, q8_0 KV, n_ctx=512, flash=1 — wall=11.705tok/s internal=11.814tok/s, gen=264, t_eval=22261.0ms
+91	11.295	7377	512	q8_0	q8_0	True	16	252	94	p9_ngen258	ok	n_gpu=16, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=11.208tok/s internal=11.295tok/s, gen=258, t_eval=22753.0ms
+92	11.842	7377	512	q8_0	q8_0	True	16	252	94	p9_ngen270	ok	n_gpu=16, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=11.739tok/s internal=11.842tok/s, gen=270, t_eval=22715.3ms
+93	10.971	7377	512	q8_0	q8_0	True	16	248	94	p9_batch248_94_ngen264	ok	n_gpu=16, batch=248/94, q8_0 KV, n_ctx=512, flash=1 — wall=10.886tok/s internal=10.971tok/s, gen=264, t_eval=23971.9ms
+94	11.521	7377	448	q8_0	q8_0	True	16	252	94	p9_ctx448_ngen264	ok	n_gpu=16, batch=252/94, q8_0 KV, n_ctx=448, flash=1 — wall=11.418tok/s internal=11.521tok/s, gen=264, t_eval=22828.2ms
+95	11.822	7377	480	q8_0	q8_0	True	16	252	94	p9_ctx480_ngen264	ok	n_gpu=16, batch=252/94, q8_0 KV, n_ctx=480, flash=1 — wall=11.720tok/s internal=11.822tok/s, gen=264, t_eval=22246.6ms
