@@ -306,6 +306,10 @@ fn main() {
 /// Run benchmark via C shim that handles struct field access
 fn run_bench_via_shim(args: &Args) -> Result<(f64, u64, String), String> {
     unsafe {
+        // Load backends from the venv lib directory
+        let backend_dir = CString::new("/tmp/qwen35-moe-offload/.venv/lib/python3.11/site-packages/llama_cpp/lib").unwrap();
+        bench_shim_load_backends(backend_dir.as_ptr());
+
         llama_backend_init();
 
         // Get default params and patch them via our C shim
@@ -437,6 +441,7 @@ fn run_bench_via_shim(args: &Args) -> Result<(f64, u64, String), String> {
 
 // C shim functions — defined in shim.c
 extern "C" {
+    fn bench_shim_load_backends(dir_path: *const libc::c_char);
     fn bench_shim_model_params(n_gpu_layers: i32) -> llama_model_params;
     fn bench_shim_context_params(
         n_ctx: u32,

@@ -14,12 +14,10 @@ fn main() {
     println!("cargo:rustc-link-lib=dylib=llama");
     println!("cargo:rustc-link-lib=dylib=ggml");
     println!("cargo:rustc-link-lib=dylib=ggml-base");
-    println!("cargo:rustc-link-lib=dylib=ggml-cpu");
-    println!("cargo:rustc-link-lib=dylib=ggml-cuda");
 
     // RPATH so the binary finds the .so at runtime
     println!("cargo:rustc-link-arg=-Wl,-rpath,{}", lib_dir);
-    
+
     // Rerun if shim changes
     println!("cargo:rerun-if-changed=shim.c");
 }

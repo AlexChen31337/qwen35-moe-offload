@@ -1,8 +1,18 @@
 // C shim for accessing llama.cpp struct fields from Rust
 // Compiled by build.rs, linked into the bench binary
 
+#include <stdio.h>
 #include "llama.h"
 #include "ggml.h"
+#include "ggml-backend.h"
+
+void bench_shim_load_backends(const char *dir_path) {
+    if (dir_path && dir_path[0] != '\0') {
+        ggml_backend_load_all_from_path(dir_path);
+    } else {
+        ggml_backend_load_all();
+    }
+}
 
 struct llama_model_params bench_shim_model_params(int32_t n_gpu_layers) {
     struct llama_model_params params = llama_model_default_params();
