@@ -28,3 +28,8 @@ exp_id	tok_s	vram_mb	n_ctx	kv_type_k	kv_type_v	flash_attn	n_gpu	n_batch	n_ubatch
 29	11.638	7751	512	q8_0	q8_0	True	17	251	95	p10_batch251_ubatch95	ok	n_gpu=17, batch=251/95, q8_0 KV, n_ctx=512, flash=1 — wall=11.534tok/s internal=11.638tok/s, gen=264, t_eval=22599.1ms
 30	11.805	7751	512	q8_0	q8_0	True	17	252	94	p10_ngen270	ok	n_gpu=17, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=11.686tok/s internal=11.805tok/s, gen=270, t_eval=22786.6ms
 31	11.502	7751	512	q8_0	q8_0	True	17	255	96	p10_batch255_ubatch96	ok	n_gpu=17, batch=255/96, q8_0 KV, n_ctx=512, flash=1 — wall=11.401tok/s internal=11.502tok/s, gen=264, t_eval=22864.8ms
+32	11.786	7751	512	q8_0	q8_0	True	17	252	94	p10_ngen265	ok	n_gpu=17, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=11.675tok/s internal=11.786tok/s, gen=265, t_eval=22399.9ms
+33	11.884	7751	512	q8_0	q8_0	True	17	254	95	p10_batch254_ubatch95	ok	n_gpu=17, batch=254/95, q8_0 KV, n_ctx=512, flash=1 — wall=11.776tok/s internal=11.884tok/s, gen=264, t_eval=22130.0ms
+34	11.753	7751	512	q8_0	q8_0	True	17	253	94	p10_batch253_ubatch94	ok	n_gpu=17, batch=253/94, q8_0 KV, n_ctx=512, flash=1 — wall=11.650tok/s internal=11.753tok/s, gen=264, t_eval=22377.8ms
+35	11.635	7751	512	q8_0	q8_0	True	17	251	94	p10_batch251_ubatch94	ok	n_gpu=17, batch=251/94, q8_0 KV, n_ctx=512, flash=1 — wall=11.535tok/s internal=11.635tok/s, gen=264, t_eval=22604.6ms
+36	11.456	7751	512	q8_0	q8_0	True	17	252	94	p10_ngen267	ok	n_gpu=17, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=11.346tok/s internal=11.456tok/s, gen=267, t_eval=23219.1ms
