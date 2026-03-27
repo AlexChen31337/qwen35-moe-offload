@@ -1,0 +1,91 @@
+exp	tok_per_sec	vram_peak_mb	n_ctx	type_k	type_v	flash_attn	n_gpu_layers	n_batch	n_ubatch	notes	status	description
+1	11.180	7703	512	q8_0	q8_0	True	16	48	48		discard	n_gpu=16, batch=48/48, q8_0 KV, n_ctx=512
+2	11.184	7703	512	q8_0	q8_0	True	16	56	56		discard	n_gpu=16, batch=56/56, q8_0 KV, n_ctx=512
+3	10.533	7703	512	q8_0	q8_0	True	16	72	72		discard	n_gpu=16, batch=72/72, q8_0 KV, n_ctx=512
+4	11.114	7703	512	q8_0	q8_0	True	16	80	80		discard	n_gpu=16, batch=80/80, q8_0 KV, n_ctx=512
+5	11.757	7705	512	q8_0	q8_0	True	16	96	96		discard	n_gpu=16, batch=96/96, q8_0 KV, n_ctx=512
+6	11.374	7571	512	q8_0	q8_0	True	16	64	16	asym_ubatch	discard	n_gpu=16, batch=64/16, q8_0 KV, n_ctx=512
+7	10.698	7701	512	q8_0	q8_0	True	16	64	32	asym_ubatch	discard	n_gpu=16, batch=64/32, q8_0 KV, n_ctx=512
+8	11.727	7703	512	q8_0	q8_0	True	16	64	48	asym_ubatch	discard	n_gpu=16, batch=64/48, q8_0 KV, n_ctx=512
+9	11.874	7703	512	q8_0	q8_0	True	16	64	128	asym_ubatch	keep	n_gpu=16, batch=64/128, q8_0 KV, n_ctx=512 — NEW BEST
+10	11.473	7703	512	q8_0	q8_0	True	16	64	256	asym_ubatch	discard	n_gpu=16, batch=64/256, q8_0 KV, n_ctx=512
+11	10.315	7571	512	q8_0	q8_0	True	16	128	16	asym_ubatch	discard	n_gpu=16, batch=128/16, q8_0 KV, n_ctx=512
+12	11.410	7701	512	q8_0	q8_0	True	16	128	32	asym_ubatch	discard	n_gpu=16, batch=128/32, q8_0 KV, n_ctx=512
+13	10.458	7703	512	q8_0	q8_0	True	16	128	48	asym_ubatch	discard	n_gpu=16, batch=128/48, q8_0 KV, n_ctx=512
+14	11.184	7708	512	q8_0	q8_0	True	16	128	64	asym_ubatch	discard	n_gpu=16, batch=128/64, q8_0 KV, n_ctx=512
+15	11.584	7710	512	q8_0	q8_0	True	16	128	96	asym_ubatch	discard	n_gpu=16, batch=128/96, q8_0 KV, n_ctx=512
+16	10.574	7704	256	q8_0	q8_0	True	16	64	64		usable	n_gpu=16, batch=64/64, q8_0 KV, n_ctx=256
+17	11.586	7708	512	q8_0	q8_0	True	16	64	64		usable	n_gpu=16, batch=64/64, q8_0 KV, n_ctx=512
+18	11.680	7710	1024	q8_0	q8_0	True	16	64	64		usable	n_gpu=16, batch=64/64, q8_0 KV, n_ctx=1024
+19	11.452	7714	2048	q8_0	q8_0	True	16	64	64		usable	n_gpu=16, batch=64/64, q8_0 KV, n_ctx=2048
+20	10.924	7722	4096	q8_0	q8_0	True	16	64	64		usable	n_gpu=16, batch=64/64, q8_0 KV, n_ctx=4096
+21	0.000	0	8192	q8_0	q8_0	True	16	64	64	NO_JSON	NO_JSON	ctx=8192 — rc=-6, stdout=[New LWP 233107]
+22	0.000	0	16384	q8_0	q8_0	True	16	64	64	NO_JSON	NO_JSON	ctx=16384 — rc=-6, stdout=[New LWP 233743]
+23	0.000	0	32768	q8_0	q8_0	True	16	64	64	NO_JSON	NO_JSON	ctx=32768 — rc=-6, stdout=[New LWP 233816]
+24	0.000	0	8192	q8_0	q8_0	True	16	64	64	rope=10000|NO_JSON	NO_JSON	rope=10000 — rc=-6, stdout=[New LWP 233890]
+25	0.000	0	8192	q8_0	q8_0	True	16	64	64	rope=100000|NO_JSON	NO_JSON	rope=100000 — rc=-6, stdout=[New LWP 233997]
+26	0.000	0	8192	q8_0	q8_0	True	16	64	64	rope=500000|NO_JSON	NO_JSON	rope=500000 — rc=-6, stdout=[New LWP 234135]
+27	0.000	0	8192	q8_0	q8_0	True	16	64	64	rope=1000000|NO_JSON	NO_JSON	rope=1000000 — rc=-6, stdout=[New LWP 234234]
+28	0.000	0	16384	q8_0	q8_0	True	16	64	64	rope=10000|NO_JSON	NO_JSON	rope=10000 ctx=16K — rc=-6, stdout=[New LWP 234340]
+29	0.000	0	16384	q8_0	q8_0	True	16	64	64	rope=500000|NO_JSON	NO_JSON	rope=500000 ctx=16K — rc=-6, stdout=[New LWP 234413]
+30	0.000	0	16384	q8_0	q8_0	True	16	64	64	rope=1000000|NO_JSON	NO_JSON	rope=1000000 ctx=16K — rc=-6, stdout=[New LWP 234484]
+31	0.000	0	512	q4_0	q8_0	True	14	64	64	TIMEOUT	TIMEOUT	q4_0K/q8_0V n_gpu=14 — >240s
+32	11.322	7700	512	q4_0	q8_0	True	16	64	64	reverse_asym	discard	q4_0K/q8_0V, n_gpu=16, batch=64/64, n_ctx=512
+33	11.174	7695	512	iq4_nl	iq4_nl	True	16	64	64		discard	iq4_nl KV, n_gpu=16, batch=64/64, n_ctx=512
+34	0.000	0	512	q4_k	q4_k	True	16	64	64	NO_JSON	NO_JSON	q4_k/q4_k — rc=-6, stdout=[New LWP 234990]
+35	0.000	0	512	q5_k	q5_k	True	16	64	64	NO_JSON	NO_JSON	q5_k/q5_k — rc=-6, stdout=[New LWP 235038]
+36	11.601	7695	512	q8_0	iq4_nl	True	16	64	64	asym_iq4nl	discard	q8_0K/iq4_nlV, n_gpu=16, batch=64/64, n_ctx=512
+37	10.890	7695	512	iq4_nl	q8_0	True	16	64	64	asym_iq4nl	discard	iq4_nlK/q8_0V, n_gpu=16, batch=64/64, n_ctx=512
+38	11.816	7703	512	q8_0	q8_0	True	16	64	64	op_offload	discard	n_gpu=16, q8_0 KV, batch=64/64, op_offload
+39	11.591	7703	512	q8_0	q8_0	True	16	64	64	swa_full	discard	n_gpu=16, q8_0 KV, batch=64/64, swa_full
+40	11.545	7703	512	q8_0	q8_0	True	16	64	64	both_flags	discard	n_gpu=16, q8_0 KV, batch=64/64, op_offload+swa_full
+41	10.298	7703	512	q8_0	q8_0	True	16	48	48	combo	discard	batch48+op_offload, n_gpu=16, q8_0 KV
+42	11.358	7703	512	q8_0	q8_0	True	16	56	56	combo	discard	batch56+op_offload, n_gpu=16, q8_0 KV
+43	10.604	7703	512	q8_0	q8_0	True	16	72	72	combo	discard	batch72+op_offload, n_gpu=16, q8_0 KV
+44	10.872	7695	512	q4_0	q8_0	True	16	64	128	best_batch+asym	discard	batch64/128, q4_0K/q8_0V, n_gpu=16
+45	11.558	7695	512	q8_0	q4_0	True	16	64	128	best_batch+asym	discard	batch64/128, q8_0K/q4_0V, n_gpu=16
+46	10.420	7703	512	q8_0	q8_0	True	16	64	128	best+op_offload	discard	batch64/128, q8_0 KV, op_offload
+47	10.129	7703	512	q8_0	q8_0	True	16	64	128	best+swa_full	discard	batch64/128, q8_0 KV, swa_full
+48	11.122	7703	512	q8_0	q8_0	True	16	64	128	best+both	discard	batch64/128, q8_0 KV, op_offload+swa_full
+49	11.483	7697	512	f16	f16	False	16	64	64	no_flash	discard	f16 KV, no flash_attn, n_gpu=16, batch=64/64
+50	9.787	6955	512	q8_0	q8_0	True	14	48	48	n_gpu14	discard	n_gpu=14, batch=48/48, q8_0 KV
+51	10.738	6955	512	q8_0	q8_0	True	14	56	56	n_gpu14	discard	n_gpu=14, batch=56/56, q8_0 KV
+52	9.633	6955	512	q8_0	q8_0	True	14	64	64	n_gpu14	discard	n_gpu=14, batch=64/64, q8_0 KV
+53	11.218	6955	512	q8_0	q8_0	True	14	72	72	n_gpu14	discard	n_gpu=14, batch=72/72, q8_0 KV
+54	11.154	6955	512	q8_0	q8_0	True	14	80	80	n_gpu14	discard	n_gpu=14, batch=80/80, q8_0 KV
+55	10.122	6955	512	q8_0	q8_0	True	14	64	128	n_gpu14+asym	discard	n_gpu=14, batch=64/128, q8_0 KV
+56	11.122	7703	512	q8_0	q8_0	True	16	64	64	thread_tune	discard	n_threads=9, n_gpu=16, batch=64/64, q8_0 KV
+57	11.771	7703	512	q8_0	q8_0	True	16	64	64	thread_tune	discard	n_threads=11, n_gpu=16, batch=64/64, q8_0 KV
+58	10.809	7703	512	q8_0	q8_0	True	16	64	128	best_threads	discard	n_threads=9, batch=64/128, q8_0 KV
+59	11.684	7703	512	q8_0	q8_0	True	16	64	128	best_threads	discard	n_threads=11, batch=64/128, q8_0 KV
+60	10.799	7703	512	q8_0	q8_0	True	16	64	64	gen512	discard	gen=512tok, n_gpu=16, batch=64/64, q8_0 KV
+61	0.000	0	512	q8_0	q8_0	True	16	64	128	gen512_best|OOM	OOM	gen=512tok, batch=64/128, q8_0 KV — OOM: Failed to load model from file: models/Qwen3.5-35B-A3B-Q3_K_M.gguf
+62	10.745	7703	512	q8_0	q8_0	True	16	64	128	variance	discard	baseline retest 1 (variance)
+63	11.417	7703	512	q8_0	q8_0	True	16	64	128	variance	discard	baseline retest 2 (variance)
+64	11.441	7703	512	q8_0	q8_0	True	16	64	128	variance	discard	baseline retest 3 (variance)
+65	11.321	7705	1024	q8_0	q8_0	True	16	64	128	best_ctx	discard	batch64/128, q8_0 KV, n_ctx=1024
+66	10.689	7709	2048	q8_0	q8_0	True	16	64	128	best_ctx	discard	batch64/128, q8_0 KV, n_ctx=2048
+67	11.344	7717	4096	q8_0	q8_0	True	16	64	128	best_ctx	discard	batch64/128, q8_0 KV, n_ctx=4096
+68	11.336	7707	2048	q8_0	q8_0	True	16	32	32	safe_ctx	discard	n_ctx=2048, batch=32/32, q8_0 KV (safe ctx test)
+69	11.432	7715	4096	q8_0	q8_0	True	16	32	32	safe_ctx	discard	n_ctx=4096, batch=32/32, q8_0 KV (safe ctx test)
+70	1.256	7825	8192	q8_0	q8_0	True	16	32	32	safe_ctx_long	discard	n_ctx=8192, batch=32/32, q8_0 KV (safe ctx, long prompt)
+71	0.000	0	16384	q8_0	q8_0	True	16	32	32	safe_ctx_long|NO_JSON	NO_JSON	n_ctx=16384, batch=32/32, q8_0 KV (safe ctx, long prompt) — NO_JSON: rc=-6, stderr= utilized
+/home/runner/work/llama-cpp-python/llama-cpp-python/vend
+72	1.236	7812	8192	q4_0	q4_0	True	16	32	32	min_vram_ctx	discard	n_ctx=8192, batch=32/32, q4_0 KV (min VRAM ctx)
+73	0.000	0	16384	q4_0	q4_0	True	16	32	32	min_vram_ctx|NO_JSON	NO_JSON	n_ctx=16384, batch=32/32, q4_0 KV (min VRAM ctx) — NO_JSON: rc=-6, stderr= utilized
+/home/runner/work/llama-cpp-python/llama-cpp-python/vend
+74	0.000	0	32768	q4_0	q4_0	True	16	32	32	max_ctx|NO_JSON	NO_JSON	n_ctx=32768, batch=32/32, q4_0 KV (max ctx) — NO_JSON: rc=-6, stderr= utilized
+/home/runner/work/llama-cpp-python/llama-cpp-python/vend
+75	11.494	7708	512	q8_0	q8_0	True	16	64	96	ubatch_tune	discard	batch=64/96, q8_0 KV, n_gpu=16
+76	11.315	7708	512	q8_0	q8_0	True	16	64	192	ubatch_tune	discard	batch=64/192, q8_0 KV, n_gpu=16
+77	11.433	7710	512	q8_0	q8_0	True	16	96	128	ubatch_tune	discard	batch=96/128, q8_0 KV, n_gpu=16
+78	10.628	7710	512	q8_0	q8_0	True	16	96	96	combo2	discard	batch=96/96+op_offload, q8_0 KV, n_gpu=16
+79	11.043	7700	512	iq4_nl	iq4_nl	True	16	64	128	best_batch+iq4nl	discard	batch64/128, iq4_nl KV, n_gpu=16
+80	11.757	7710	512	q8_0	q8_0	True	16	96	128	batch_explore	discard	batch=96/128, q8_0 KV, n_gpu=16
+81	11.855	7708	512	q8_0	q8_0	True	16	48	128	batch_explore	discard	batch=48/128, q8_0 KV, n_gpu=16
+82	11.521	7701	512	q8_0	q8_0	True	16	32	128	batch_explore	discard	batch=32/128, q8_0 KV, n_gpu=16
+83	11.259	7327	512	q8_0	q8_0	True	15	64	128	n_gpu15	discard	n_gpu=15, batch=64/128, q8_0 KV
+84	11.003	7327	512	q8_0	q8_0	True	15	64	64	n_gpu15	discard	n_gpu=15, batch=64/64, q8_0 KV
+85	11.868	7703	512	q8_0	q8_0	True	16	64	128	variance	discard	retest best 4 (variance)
+86	11.767	7703	512	q8_0	q8_0	True	16	64	128	variance	discard	retest best 5 (variance)
+87	10.338	7737	8192	q8_0	q8_0	True	16	64	128	n_ctx_8192_upgrade_verify	ok	n_gpu=16, batch=64/128, q8_0 KV, n_ctx=8192 — no segfault after vram clear
