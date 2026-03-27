@@ -62,3 +62,14 @@ exp32		7705	512	q8_0	q8_0	True	16	256	104	p9c2_e32	ok	n_threads=12,gen=256
 63	11.353	7700	512	q8_0	q8_0	True	16	252	94	phase9_batch252_94_thread12	ok	n_gpu=16, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=11.257tok/s internal=11.353tok/s, gen=256, t_eval=22461.4ms
 64	11.153	7700	512	q8_0	q8_0	True	16	250	92	phase9_batch250_92_thread11	ok	n_gpu=16, batch=250/92, q8_0 KV, n_ctx=512, flash=1 — wall=11.054tok/s internal=11.153tok/s, gen=256, t_eval=22864.0ms
 65	0.000	0	512	q8_0	q8_0	True	16	254	96	phase9_batch254_96_thread11	crash	Failed to load model
+66	0.000	0	512	q8_0	q8_0	True	16	252	94	phase9_best_repeat	crash	Failed to load model
+70	0.000	0	512	q8_0	q8_0	True	18	252	94	p9_ngpu18	crash	Failed to load model
+71	11.652	7377	384	q8_0	q8_0	True	16	252	94	p9_ctx384_bestbatch	ok	n_gpu=16, batch=252/94, q8_0 KV, n_ctx=384, flash=1 — wall=11.557tok/s internal=11.652tok/s, gen=256, t_eval=21884.8ms
+72	11.904	7377	256	q8_0	q8_0	True	16	252	94	p9_ctx256_bestbatch	ok	n_gpu=16, batch=252/94, q8_0 KV, n_ctx=256, flash=1 — wall=11.841tok/s internal=11.904tok/s, gen=252, t_eval=21085.1ms
+73	11.425	7377	512	q8_0	q8_0	True	16	254	94	p9_batch254_94_th11	ok	n_gpu=16, batch=254/94, q8_0 KV, n_ctx=512, flash=1 — wall=11.334tok/s internal=11.425tok/s, gen=256, t_eval=22320.2ms
+74	11.539	7377	256	q8_0	q8_0	True	16	250	92	p9_ctx256_250_92	ok	n_gpu=16, batch=250/92, q8_0 KV, n_ctx=256, flash=1 — wall=11.486tok/s internal=11.539tok/s, gen=252, t_eval=21752.7ms
+75	11.534	7377	512	q8_0	q8_0	True	16	252	94	p9_th10_bestbatch	ok	n_gpu=16, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=11.446tok/s internal=11.534tok/s, gen=256, t_eval=22109.0ms
+76	11.752	7377	256	q8_0	q8_0	True	16	256	96	p9_ctx256_256_96	ok	n_gpu=16, batch=256/96, q8_0 KV, n_ctx=256, flash=1 — wall=11.689tok/s internal=11.752tok/s, gen=252, t_eval=21357.9ms
+77	11.160	7377	512	q8_0	q8_0	True	16	252	94	p9_th12_bestbatch	ok	n_gpu=16, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=11.066tok/s internal=11.160tok/s, gen=256, t_eval=22849.0ms
+78	10.965	7377	512	q8_0	q8_0	True	16	252	94	p9_th13_bestbatch	ok	n_gpu=16, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=10.873tok/s internal=10.965tok/s, gen=256, t_eval=23255.3ms
+79	10.799	7377	512	q8_0	q8_0	True	16	248	92	p9_batch248_92	ok	n_gpu=16, batch=248/92, q8_0 KV, n_ctx=512, flash=1 — wall=10.708tok/s internal=10.799tok/s, gen=256, t_eval=23613.9ms
