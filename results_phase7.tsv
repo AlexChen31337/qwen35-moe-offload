@@ -19,3 +19,14 @@ exp_id	tok_s	compression_ratio	n_ctx	kv_algo	n_gpu	n_batch	label	status	notes
 18	11.650	7.59	310000	pq4_hybrid_offload	16	64	hybrid_pq4_310k	theoretical	Hybrid: iq4_nl VRAM + PQ4 RAM offload → ~310K context, ~11.65 tok/s, cos_sim=0.89 for offloaded tokens
 19	11.650	5.16	210000	pq6_hybrid_offload	16	64	hybrid_pq6_210k	theoretical	Hybrid: iq4_nl VRAM + PQ6 RAM offload → ~210K context, ~11.65 tok/s, cos_sim=0.99 for offloaded tokens
 20	0.000	0.00	0	qjl_attn_sketch_study	0	0	qjl_attn_speedup	fail	QJL sketch attention 250-16000x SLOWER than full matmul (even in Rust). Not viable for CPU attention.
+21	12.095	7.50	512	uniform_quant_4bit_numpy	0	0	uni4_numpy_vectorised	ok	DISCOVERY: Vectorised uniform quant 4-bit BEATS PolarQuant (0.917 vs 0.891 cos_sim), 0.13ms/tok overhead (0.2%), max=12.095 tok/s
+22	12.096	5.10	512	uniform_quant_6bit_numpy	0	0	uni6_numpy_vectorised	ok	Uniform quant 6-bit: cos_sim=0.995, 0.12ms/tok, ratio=5.1x, effectively zero overhead
+23	12.096	3.90	512	uniform_quant_8bit_numpy	0	0	uni8_numpy_vectorised	ok	Uniform quant 8-bit: cos_sim=0.9997, 0.12ms/tok, ratio=3.9x, zero overhead
+24	12.095	14.20	512	uniform_quant_2bit_numpy	0	0	uni2_numpy_vectorised	ok	Uniform quant 2-bit: cos_sim=0.800, 0.13ms/tok, ratio=14.2x — aggressive but usable for old tokens
+25	12.096	9.80	512	uniform_quant_3bit_numpy	0	0	uni3_numpy_vectorised	ok	Uniform quant 3-bit: cos_sim=0.802, 0.12ms/tok, ratio=9.8x — similar quality to 2-bit (plateau)
+26	12.096	6.10	512	uniform_quant_5bit_numpy	0	0	uni5_numpy_vectorised	ok	Uniform quant 5-bit: cos_sim=0.979, 0.12ms/tok, ratio=6.1x — good quality/compression tradeoff
+27	0.000	0.00	0	pq_vs_uniform_comparison	0	0	quality_comparison	ok	PolarQuant LOSES to uniform quant at ALL bit widths (2b: 0.26 vs 0.80, 4b: 0.89 vs 0.92, 8b: 0.9996 vs 0.9997)
+28	0.000	0.00	0	q8_pq4_stacking	0	0	hybrid_quality_study	ok	q8_0 + PQ4 stacking: ZERO additional quality loss. q8_0 dequant → PQ4 compress = same quality as PQ4 direct
+29	0.000	0.00	0	pq_quality_vs_headdim	0	0	headdim_sweep_rust	ok	PQ4 quality degrades with head_dim: d=32→0.944, d=128→0.897, d=256→0.816, d=512→0.677 (spherical coord curse)
+30	11.676	5.16	310000	pq6_rust_hybrid_310k	16	64	hybrid_pq6_rust_310k	theoretical	Hybrid: iq4_nl VRAM + PQ6 Rust offload → 310K ctx, 3.1ms overhead, ~11.67 tok/s. Needs llama.cpp KV API.
+31	12.095	7.50	310000	uni4_numpy_hybrid_310k	16	64	hybrid_uni4_310k	theoretical	BEST: iq4_nl VRAM + uniform 4-bit NumPy offload → 310K ctx, 0.13ms overhead, ~12.09 tok/s. Needs llama.cpp KV API.
