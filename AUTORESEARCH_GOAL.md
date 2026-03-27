@@ -47,3 +47,21 @@ Maximize tok/s for Qwen3.5-35B-A3B-Q3_K_M on RTX 3070 8GB. No ceiling. No predic
 
 ## Done When
 Never. Hardware physically stops you.
+
+## Phase 7 Findings (2026-03-27)
+- PolarQuant loses to simple uniform quant on Gaussian KV distributions
+- QJL needs CUDA kernel to be viable (250-16000x slower on CPU)
+- llama.cpp has NO API to extract/inject KV cache entries — integration wall
+- All-time best: 12.114 tok/s (Phase 6, exp 117: n_gpu=16, batch=256/64, q8_0, n_threads=12, gen=256)
+- Theoretical ceiling: 310K context at 12.09 tok/s with hybrid iq4_nl+uniform RAM offload
+
+## Phase 8 Axes (unexplored — agent decides freely)
+- **llama.cpp patch**: fork llama.cpp, add KV extract/inject API, integrate uniform quant offload
+- **Different runtime**: vLLM, llama-cpp-python upgrade, mlx-lm, or candle (Rust ML framework)
+- **Speculative decoding**: draft model + target model — can it beat 12.114 on this hardware?
+- **Continuous batching**: serve multiple requests, measure aggregate tok/s
+- **Generation length effect**: does tok/s improve at gen=512, 1024? (Phase 6 found gen=256 > gen=128)
+- **MoE expert routing analysis**: which experts activate most? Can we pre-load hot experts to VRAM?
+- **Quantization of weights (not KV)**: try Q2_K, Q4_K_M variants — different GGUF files
+- **Flash attention variants**: try different flash_attn implementations
+- Agent decides — no ceiling, no targets, hardware sets the limit
