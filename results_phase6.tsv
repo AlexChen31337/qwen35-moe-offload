@@ -4,3 +4,8 @@ exp_id	tok_s	vram_mb	n_ctx	kv_type_k	kv_type_v	flash_attn	n_gpu	n_batch	n_ubatch
 3	8.662	7701	512	q8_0	q8_0	True	16	64	64	baseline_n16	ok	n_gpu=16, batch=64/64, q8_0 KV, n_ctx=512, flash=1 — wall=8.637tok/s internal=8.662tok/s, gen=128, t_eval=14661.4ms
 4	6.747	7701	512	q8_0	q8_0	True	16	64	128	baseline_p5_config	ok	n_gpu=16, batch=64/128, q8_0 KV, n_ctx=512, flash=1 — wall=6.737tok/s internal=6.747tok/s, gen=128, t_eval=18823.4ms
 5	7.987	7701	512	q8_0	q8_0	True	16	128	64	batch128_ubatch64	ok	n_gpu=16, batch=128/64, q8_0 KV, n_ctx=512, flash=1 — wall=7.954tok/s internal=7.987tok/s, gen=128, t_eval=15900.7ms
+6	9.960	7325	512	q8_0	q8_0	True	15	64	64	ngpu_sweep_15	ok	n_gpu=15, batch=64/64, q8_0 KV, n_ctx=512, flash=1 — wall=9.908tok/s internal=9.960tok/s, gen=128, t_eval=12750.8ms
+7	0.000	0	512	q8_0	q8_0	True	17	64	64	ngpu_sweep_17	crash	Failed to load model
+8	7.882	6211	512	q8_0	q8_0	True	12	64	64	ngpu_sweep_12	ok	n_gpu=12, batch=64/64, q8_0 KV, n_ctx=512, flash=1 — wall=7.850tok/s internal=7.882tok/s, gen=128, t_eval=16113.3ms
+9	6.539	5463	512	q8_0	q8_0	True	10	64	64	ngpu_sweep_10	ok	n_gpu=10, batch=64/64, q8_0 KV, n_ctx=512, flash=1 — wall=6.519tok/s internal=6.539tok/s, gen=128, t_eval=19423.3ms
+10	6.957	4723	512	q8_0	q8_0	True	8	64	64	ngpu_sweep_8	ok	n_gpu=8, batch=64/64, q8_0 KV, n_ctx=512, flash=1 — wall=6.929tok/s internal=6.957tok/s, gen=128, t_eval=18254.1ms
