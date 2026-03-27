@@ -57,3 +57,8 @@ exp32		7705	512	q8_0	q8_0	True	16	256	104	p9c2_e32	ok	n_threads=12,gen=256
 58	11.577	7700	512	q8_0	q8_0	True	16	250	96	phase9_batch250_96_thread11	ok	n_gpu=16, batch=250/96, q8_0 KV, n_ctx=512, flash=1 — wall=11.484tok/s internal=11.577tok/s, gen=256, t_eval=22026.1ms
 59	11.453	7700	512	q8_0	q8_0	True	16	254	94	phase9_batch254_94_thread11	ok	n_gpu=16, batch=254/94, q8_0 KV, n_ctx=512, flash=1 — wall=11.365tok/s internal=11.453tok/s, gen=256, t_eval=22265.8ms
 60	10.780	7700	512	q8_0	q8_0	True	16	252	94	phase9_batch252_94_thread10	ok	n_gpu=16, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=10.704tok/s internal=10.780tok/s, gen=256, t_eval=23654.0ms
+61	11.452	7700	512	q8_0	q8_0	True	16	248	92	phase9_batch248_92_thread11	ok	n_gpu=16, batch=248/92, q8_0 KV, n_ctx=512, flash=1 — wall=11.355tok/s internal=11.452tok/s, gen=256, t_eval=22267.1ms
+62	11.565	7700	512	q8_0	q8_0	True	16	256	96	phase9_batch256_96_thread11	ok	n_gpu=16, batch=256/96, q8_0 KV, n_ctx=512, flash=1 — wall=11.467tok/s internal=11.565tok/s, gen=256, t_eval=22050.2ms
+63	11.353	7700	512	q8_0	q8_0	True	16	252	94	phase9_batch252_94_thread12	ok	n_gpu=16, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=11.257tok/s internal=11.353tok/s, gen=256, t_eval=22461.4ms
+64	11.153	7700	512	q8_0	q8_0	True	16	250	92	phase9_batch250_92_thread11	ok	n_gpu=16, batch=250/92, q8_0 KV, n_ctx=512, flash=1 — wall=11.054tok/s internal=11.153tok/s, gen=256, t_eval=22864.0ms
+65	0.000	0	512	q8_0	q8_0	True	16	254	96	phase9_batch254_96_thread11	crash	Failed to load model
