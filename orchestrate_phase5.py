@@ -29,11 +29,41 @@ Q5_K = 13
 F16 = 1
 
 
+def ensure_vram_free(max_wait=30):
+    """Wait until VRAM is back to baseline (< 2000 MB). Also unload any ollama models."""
+    # Unload any ollama models
+    try:
+        subprocess.run(
+            ["curl", "-s", "http://localhost:11434/api/generate",
+             "-d", '{"model": "qwen3.5:4b", "keep_alive": 0}'],
+            capture_output=True, timeout=5
+        )
+    except:
+        pass
+    
+    for _ in range(max_wait):
+        try:
+            out = subprocess.check_output(
+                ["nvidia-smi", "--query-gpu=memory.used", "--format=csv,noheader,nounits"],
+                text=True
+            ).strip()
+            vram = float(out.split('\n')[0])
+            if vram < 2000:
+                return True
+        except:
+            pass
+        time.sleep(1)
+    return False
+
+
 def run_exp(n_gpu, n_ctx, n_threads=10, n_batch=64, n_ubatch=64,
             type_k=Q8_0, type_v=Q8_0, flash=True, timeout=240,
             rope_freq_base=0, long_prompt=False, max_tokens=256,
             op_offload=False, swa_full=False):
     """Run single experiment in subprocess. Returns parsed JSON or error dict."""
+    # Ensure VRAM is free before starting
+    ensure_vram_free()
+    
     tk_name = TYPE_NAMES.get(type_k, str(type_k))
     tv_name = TYPE_NAMES.get(type_v, str(type_v))
     print(f"\n  >> n_gpu={n_gpu}, n_ctx={n_ctx}, batch={n_batch}/{n_ubatch}, "
@@ -78,6 +108,9 @@ def run_exp(n_gpu, n_ctx, n_threads=10, n_batch=64, n_ubatch=64,
             cmd, capture_output=True, text=True, timeout=timeout,
             cwd="/tmp/qwen35-moe-offload", env=env
         )
+        # Wait for CUDA memory release
+        time.sleep(3)
+        
         for line in proc.stdout.strip().split('\n'):
             line = line.strip()
             if line.startswith('{'):

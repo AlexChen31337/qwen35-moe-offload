@@ -1,0 +1,172 @@
+======================================================================
+Phase 5 Autoresearch — Beyond Parameter Tuning
+Phase 4 best: 11.850 tok/s (phase4 exp 46: n_gpu=16, batch=64/64, q8_0 KV, n_ctx=512)
+Starting at exp 1
+======================================================================
+
+[AXIS 1a] Batch sweep: 48, 56, 72, 80, 96 (symmetric)
+
+  >> n_gpu=16, n_ctx=512, batch=48/48, KV=q8_0/q8_0, flash=True
+     TSV exp 1: 11.180 tok/s [discard] n_gpu=16, batch=48/48, q8_0 KV, n_ctx=512
+
+  >> n_gpu=16, n_ctx=512, batch=56/56, KV=q8_0/q8_0, flash=True
+     TSV exp 2: 11.184 tok/s [discard] n_gpu=16, batch=56/56, q8_0 KV, n_ctx=512
+
+  >> n_gpu=16, n_ctx=512, batch=72/72, KV=q8_0/q8_0, flash=True
+     TSV exp 3: 10.533 tok/s [discard] n_gpu=16, batch=72/72, q8_0 KV, n_ctx=512
+
+  >> n_gpu=16, n_ctx=512, batch=80/80, KV=q8_0/q8_0, flash=True
+     TSV exp 4: 11.114 tok/s [discard] n_gpu=16, batch=80/80, q8_0 KV, n_ctx=512
+
+  >> n_gpu=16, n_ctx=512, batch=96/96, KV=q8_0/q8_0, flash=True
+     TSV exp 5: 11.757 tok/s [discard] n_gpu=16, batch=96/96, q8_0 KV, n_ctx=512
+
+[AXIS 1b] Asymmetric ubatch: n_batch=64 with varying ubatch
+
+  >> n_gpu=16, n_ctx=512, batch=64/16, KV=q8_0/q8_0, flash=True
+     TSV exp 6: 11.374 tok/s [discard] n_gpu=16, batch=64/16, q8_0 KV, n_ctx=512
+
+  >> n_gpu=16, n_ctx=512, batch=64/32, KV=q8_0/q8_0, flash=True
+     TSV exp 7: 10.698 tok/s [discard] n_gpu=16, batch=64/32, q8_0 KV, n_ctx=512
+
+  >> n_gpu=16, n_ctx=512, batch=64/48, KV=q8_0/q8_0, flash=True
+     TSV exp 8: 11.727 tok/s [discard] n_gpu=16, batch=64/48, q8_0 KV, n_ctx=512
+
+  >> n_gpu=16, n_ctx=512, batch=64/128, KV=q8_0/q8_0, flash=True
+  *** NEW BEST: 11.874 tok/s ***
+     TSV exp 9: 11.874 tok/s [keep] n_gpu=16, batch=64/128, q8_0 KV, n_ctx=512 — NEW BEST
+
+  >> n_gpu=16, n_ctx=512, batch=64/256, KV=q8_0/q8_0, flash=True
+     TSV exp 10: 11.473 tok/s [discard] n_gpu=16, batch=64/256, q8_0 KV, n_ctx=512
+
+[AXIS 1c] Asymmetric: n_batch=128, varying ubatch
+
+  >> n_gpu=16, n_ctx=512, batch=128/16, KV=q8_0/q8_0, flash=True
+     TSV exp 11: 10.315 tok/s [discard] n_gpu=16, batch=128/16, q8_0 KV, n_ctx=512
+
+  >> n_gpu=16, n_ctx=512, batch=128/32, KV=q8_0/q8_0, flash=True
+     TSV exp 12: 11.410 tok/s [discard] n_gpu=16, batch=128/32, q8_0 KV, n_ctx=512
+
+  >> n_gpu=16, n_ctx=512, batch=128/48, KV=q8_0/q8_0, flash=True
+     TSV exp 13: 10.458 tok/s [discard] n_gpu=16, batch=128/48, q8_0 KV, n_ctx=512
+
+  >> n_gpu=16, n_ctx=512, batch=128/64, KV=q8_0/q8_0, flash=True
+     TSV exp 14: 11.184 tok/s [discard] n_gpu=16, batch=128/64, q8_0 KV, n_ctx=512
+
+  >> n_gpu=16, n_ctx=512, batch=128/96, KV=q8_0/q8_0, flash=True
+     TSV exp 15: 11.584 tok/s [discard] n_gpu=16, batch=128/96, q8_0 KV, n_ctx=512
+
+[AXIS 2] Context length sweep at best config (n_gpu=16, q8_0, batch=64/64)
+
+  >> n_gpu=16, n_ctx=256, batch=64/64, KV=q8_0/q8_0, flash=True
+     TSV exp 16: 10.574 tok/s [usable] n_gpu=16, batch=64/64, q8_0 KV, n_ctx=256
+
+  >> n_gpu=16, n_ctx=512, batch=64/64, KV=q8_0/q8_0, flash=True
+     TSV exp 17: 11.586 tok/s [usable] n_gpu=16, batch=64/64, q8_0 KV, n_ctx=512
+
+  >> n_gpu=16, n_ctx=1024, batch=64/64, KV=q8_0/q8_0, flash=True
+     TSV exp 18: 11.680 tok/s [usable] n_gpu=16, batch=64/64, q8_0 KV, n_ctx=1024
+
+  >> n_gpu=16, n_ctx=2048, batch=64/64, KV=q8_0/q8_0, flash=True
+     TSV exp 19: 11.452 tok/s [usable] n_gpu=16, batch=64/64, q8_0 KV, n_ctx=2048
+
+  >> n_gpu=16, n_ctx=4096, batch=64/64, KV=q8_0/q8_0, flash=True
+     TSV exp 20: 10.924 tok/s [usable] n_gpu=16, batch=64/64, q8_0 KV, n_ctx=4096
+
+  >> n_gpu=16, n_ctx=8192, batch=64/64, KV=q8_0/q8_0, flash=True, long_prompt
+     TSV exp 21: 0.000 tok/s [NO_JSON] ctx=8192 — rc=-6, stdout=[New LWP 233107]
+[New LWP 233106]
+[New LWP 233105]
+[New LWP 233104
+
+  >> n_gpu=16, n_ctx=16384, batch=64/64, KV=q8_0/q8_0, flash=True, long_prompt
+     TSV exp 22: 0.000 tok/s [NO_JSON] ctx=16384 — rc=-6, stdout=[New LWP 233743]
+[New LWP 233742]
+[New LWP 233741]
+[New LWP 233740
+
+  >> n_gpu=16, n_ctx=32768, batch=64/64, KV=q8_0/q8_0, flash=True, long_prompt
+     TSV exp 23: 0.000 tok/s [NO_JSON] ctx=32768 — rc=-6, stdout=[New LWP 233816]
+[New LWP 233815]
+[New LWP 233814]
+[New LWP 233813
+
+[AXIS 3a] Rope freq base at n_ctx=8192
+
+  >> n_gpu=16, n_ctx=8192, batch=64/64, KV=q8_0/q8_0, flash=True, rope_base=10000, long_prompt
+     TSV exp 24: 0.000 tok/s [NO_JSON] rope=10000 — rc=-6, stdout=[New LWP 233890]
+[New LWP 233889]
+[New LWP 233888]
+[New LWP 233887
+
+  >> n_gpu=16, n_ctx=8192, batch=64/64, KV=q8_0/q8_0, flash=True, rope_base=100000, long_prompt
+     TSV exp 25: 0.000 tok/s [NO_JSON] rope=100000 — rc=-6, stdout=[New LWP 233997]
+[New LWP 233996]
+[New LWP 233995]
+[New LWP 233994
+
+  >> n_gpu=16, n_ctx=8192, batch=64/64, KV=q8_0/q8_0, flash=True, rope_base=500000, long_prompt
+     TSV exp 26: 0.000 tok/s [NO_JSON] rope=500000 — rc=-6, stdout=[New LWP 234135]
+[New LWP 234134]
+[New LWP 234133]
+[New LWP 234132
+
+  >> n_gpu=16, n_ctx=8192, batch=64/64, KV=q8_0/q8_0, flash=True, rope_base=1000000, long_prompt
+     TSV exp 27: 0.000 tok/s [NO_JSON] rope=1000000 — rc=-6, stdout=[New LWP 234234]
+[New LWP 234233]
+[New LWP 234232]
+[New LWP 234231
+
+[AXIS 3b] Rope freq base at n_ctx=16384
+
+  >> n_gpu=16, n_ctx=16384, batch=64/64, KV=q8_0/q8_0, flash=True, rope_base=10000, long_prompt
+     TSV exp 28: 0.000 tok/s [NO_JSON] rope=10000 ctx=16K — rc=-6, stdout=[New LWP 234340]
+[New LWP 234339]
+[New LWP 234338]
+[New LWP 234337
+
+  >> n_gpu=16, n_ctx=16384, batch=64/64, KV=q8_0/q8_0, flash=True, rope_base=500000, long_prompt
+     TSV exp 29: 0.000 tok/s [NO_JSON] rope=500000 ctx=16K — rc=-6, stdout=[New LWP 234413]
+[New LWP 234412]
+[New LWP 234411]
+[New LWP 234410
+
+  >> n_gpu=16, n_ctx=16384, batch=64/64, KV=q8_0/q8_0, flash=True, rope_base=1000000, long_prompt
+     TSV exp 30: 0.000 tok/s [NO_JSON] rope=1000000 ctx=16K — rc=-6, stdout=[New LWP 234484]
+[New LWP 234483]
+[New LWP 234482]
+[New LWP 234481
+
+[AXIS 4a] Reverse asymmetric: q4_0 K + q8_0 V (never tried)
+
+  >> n_gpu=14, n_ctx=512, batch=64/64, KV=q4_0/q8_0, flash=True
+     TSV exp 31: 0.000 tok/s [TIMEOUT] q4_0K/q8_0V n_gpu=14 — >240s
+
+  >> n_gpu=16, n_ctx=512, batch=64/64, KV=q4_0/q8_0, flash=True
+     TSV exp 32: 11.322 tok/s [discard] q4_0K/q8_0V, n_gpu=16, batch=64/64, n_ctx=512
+
+[AXIS 4b] iq4_nl K/V at n_gpu=16
+
+  >> n_gpu=16, n_ctx=512, batch=64/64, KV=iq4_nl/iq4_nl, flash=True
+     TSV exp 33: 11.174 tok/s [discard] iq4_nl KV, n_gpu=16, batch=64/64, n_ctx=512
+
+[AXIS 4c] q4_k/q5_k KV types
+
+  >> n_gpu=16, n_ctx=512, batch=64/64, KV=q4_k/q4_k, flash=True
+     TSV exp 34: 0.000 tok/s [NO_JSON] q4_k/q4_k — rc=-6, stdout=[New LWP 234990]
+[New LWP 234989]
+[New LWP 234985]
+[Thread debuggi
+
+  >> n_gpu=16, n_ctx=512, batch=64/64, KV=q5_k/q5_k, flash=True
+     TSV exp 35: 0.000 tok/s [NO_JSON] q5_k/q5_k — rc=-6, stdout=[New LWP 235038]
+[New LWP 235037]
+[New LWP 235033]
+[Thread debuggi
+
+  >> n_gpu=16, n_ctx=512, batch=64/64, KV=q8_0/iq4_nl, flash=True
+Phase 5: 51 planned, 35 done, 51 remaining
+Current best: 11.874 tok/s
+============================================================
+
+[1/51] Exp 36: q8_0K/iq4_nlV, n_gpu=16, batch=64/64, n_ctx=512

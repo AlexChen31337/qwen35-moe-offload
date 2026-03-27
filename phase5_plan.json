@@ -1,0 +1,69 @@
+[
+  {"exp": 36, "n_gpu": 16, "n_ctx": 512, "type_k": 8, "type_v": 20, "desc": "q8_0K/iq4_nlV, n_gpu=16, batch=64/64, n_ctx=512", "notes": "asym_iq4nl"},
+  {"exp": 37, "n_gpu": 16, "n_ctx": 512, "type_k": 20, "type_v": 8, "desc": "iq4_nlK/q8_0V, n_gpu=16, batch=64/64, n_ctx=512", "notes": "asym_iq4nl"},
+
+  {"exp": 38, "n_gpu": 16, "n_ctx": 512, "type_k": 8, "type_v": 8, "op_offload": true, "desc": "n_gpu=16, q8_0 KV, batch=64/64, op_offload", "notes": "op_offload"},
+  {"exp": 39, "n_gpu": 16, "n_ctx": 512, "type_k": 8, "type_v": 8, "swa_full": true, "desc": "n_gpu=16, q8_0 KV, batch=64/64, swa_full", "notes": "swa_full"},
+  {"exp": 40, "n_gpu": 16, "n_ctx": 512, "type_k": 8, "type_v": 8, "op_offload": true, "swa_full": true, "desc": "n_gpu=16, q8_0 KV, batch=64/64, op_offload+swa_full", "notes": "both_flags"},
+
+  {"exp": 41, "n_gpu": 16, "n_ctx": 512, "n_batch": 48, "n_ubatch": 48, "type_k": 8, "type_v": 8, "op_offload": true, "desc": "batch48+op_offload, n_gpu=16, q8_0 KV", "notes": "combo"},
+  {"exp": 42, "n_gpu": 16, "n_ctx": 512, "n_batch": 56, "n_ubatch": 56, "type_k": 8, "type_v": 8, "op_offload": true, "desc": "batch56+op_offload, n_gpu=16, q8_0 KV", "notes": "combo"},
+  {"exp": 43, "n_gpu": 16, "n_ctx": 512, "n_batch": 72, "n_ubatch": 72, "type_k": 8, "type_v": 8, "op_offload": true, "desc": "batch72+op_offload, n_gpu=16, q8_0 KV", "notes": "combo"},
+
+  {"exp": 44, "n_gpu": 16, "n_ctx": 512, "n_batch": 64, "n_ubatch": 128, "type_k": 2, "type_v": 8, "desc": "batch64/128, q4_0K/q8_0V, n_gpu=16", "notes": "best_batch+asym"},
+  {"exp": 45, "n_gpu": 16, "n_ctx": 512, "n_batch": 64, "n_ubatch": 128, "type_k": 8, "type_v": 2, "desc": "batch64/128, q8_0K/q4_0V, n_gpu=16", "notes": "best_batch+asym"},
+
+  {"exp": 46, "n_gpu": 16, "n_ctx": 512, "n_batch": 64, "n_ubatch": 128, "type_k": 8, "type_v": 8, "op_offload": true, "desc": "batch64/128, q8_0 KV, op_offload", "notes": "best+op_offload"},
+  {"exp": 47, "n_gpu": 16, "n_ctx": 512, "n_batch": 64, "n_ubatch": 128, "type_k": 8, "type_v": 8, "swa_full": true, "desc": "batch64/128, q8_0 KV, swa_full", "notes": "best+swa_full"},
+  {"exp": 48, "n_gpu": 16, "n_ctx": 512, "n_batch": 64, "n_ubatch": 128, "type_k": 8, "type_v": 8, "op_offload": true, "swa_full": true, "desc": "batch64/128, q8_0 KV, op_offload+swa_full", "notes": "best+both"},
+
+  {"exp": 49, "n_gpu": 16, "n_ctx": 512, "type_k": 1, "type_v": 1, "flash": false, "n_batch": 64, "n_ubatch": 64, "desc": "f16 KV, no flash_attn, n_gpu=16, batch=64/64", "notes": "no_flash"},
+
+  {"exp": 50, "n_gpu": 14, "n_ctx": 512, "n_batch": 48, "n_ubatch": 48, "type_k": 8, "type_v": 8, "desc": "n_gpu=14, batch=48/48, q8_0 KV", "notes": "n_gpu14"},
+  {"exp": 51, "n_gpu": 14, "n_ctx": 512, "n_batch": 56, "n_ubatch": 56, "type_k": 8, "type_v": 8, "desc": "n_gpu=14, batch=56/56, q8_0 KV", "notes": "n_gpu14"},
+  {"exp": 52, "n_gpu": 14, "n_ctx": 512, "n_batch": 64, "n_ubatch": 64, "type_k": 8, "type_v": 8, "desc": "n_gpu=14, batch=64/64, q8_0 KV", "notes": "n_gpu14"},
+  {"exp": 53, "n_gpu": 14, "n_ctx": 512, "n_batch": 72, "n_ubatch": 72, "type_k": 8, "type_v": 8, "desc": "n_gpu=14, batch=72/72, q8_0 KV", "notes": "n_gpu14"},
+  {"exp": 54, "n_gpu": 14, "n_ctx": 512, "n_batch": 80, "n_ubatch": 80, "type_k": 8, "type_v": 8, "desc": "n_gpu=14, batch=80/80, q8_0 KV", "notes": "n_gpu14"},
+  {"exp": 55, "n_gpu": 14, "n_ctx": 512, "n_batch": 64, "n_ubatch": 128, "type_k": 8, "type_v": 8, "desc": "n_gpu=14, batch=64/128, q8_0 KV", "notes": "n_gpu14+asym"},
+
+  {"exp": 56, "n_gpu": 16, "n_ctx": 512, "n_threads": 9, "n_batch": 64, "n_ubatch": 64, "type_k": 8, "type_v": 8, "desc": "n_threads=9, n_gpu=16, batch=64/64, q8_0 KV", "notes": "thread_tune"},
+  {"exp": 57, "n_gpu": 16, "n_ctx": 512, "n_threads": 11, "n_batch": 64, "n_ubatch": 64, "type_k": 8, "type_v": 8, "desc": "n_threads=11, n_gpu=16, batch=64/64, q8_0 KV", "notes": "thread_tune"},
+  {"exp": 58, "n_gpu": 16, "n_ctx": 512, "n_threads": 9, "n_batch": 64, "n_ubatch": 128, "type_k": 8, "type_v": 8, "desc": "n_threads=9, batch=64/128, q8_0 KV", "notes": "best_threads"},
+  {"exp": 59, "n_gpu": 16, "n_ctx": 512, "n_threads": 11, "n_batch": 64, "n_ubatch": 128, "type_k": 8, "type_v": 8, "desc": "n_threads=11, batch=64/128, q8_0 KV", "notes": "best_threads"},
+
+  {"exp": 60, "n_gpu": 16, "n_ctx": 512, "n_batch": 64, "n_ubatch": 64, "type_k": 8, "type_v": 8, "max_tokens": 512, "desc": "gen=512tok, n_gpu=16, batch=64/64, q8_0 KV", "notes": "gen512"},
+  {"exp": 61, "n_gpu": 16, "n_ctx": 512, "n_batch": 64, "n_ubatch": 128, "type_k": 8, "type_v": 8, "max_tokens": 512, "desc": "gen=512tok, batch=64/128, q8_0 KV", "notes": "gen512_best"},
+
+  {"exp": 62, "n_gpu": 16, "n_ctx": 512, "n_batch": 64, "n_ubatch": 128, "type_k": 8, "type_v": 8, "desc": "baseline retest 1 (variance)", "notes": "variance"},
+  {"exp": 63, "n_gpu": 16, "n_ctx": 512, "n_batch": 64, "n_ubatch": 128, "type_k": 8, "type_v": 8, "desc": "baseline retest 2 (variance)", "notes": "variance"},
+  {"exp": 64, "n_gpu": 16, "n_ctx": 512, "n_batch": 64, "n_ubatch": 128, "type_k": 8, "type_v": 8, "desc": "baseline retest 3 (variance)", "notes": "variance"},
+
+  {"exp": 65, "n_gpu": 16, "n_ctx": 1024, "n_batch": 64, "n_ubatch": 128, "type_k": 8, "type_v": 8, "desc": "batch64/128, q8_0 KV, n_ctx=1024", "notes": "best_ctx"},
+  {"exp": 66, "n_gpu": 16, "n_ctx": 2048, "n_batch": 64, "n_ubatch": 128, "type_k": 8, "type_v": 8, "desc": "batch64/128, q8_0 KV, n_ctx=2048", "notes": "best_ctx"},
+  {"exp": 67, "n_gpu": 16, "n_ctx": 4096, "n_batch": 64, "n_ubatch": 128, "type_k": 8, "type_v": 8, "desc": "batch64/128, q8_0 KV, n_ctx=4096", "notes": "best_ctx"},
+
+  {"exp": 68, "n_gpu": 16, "n_ctx": 2048, "n_batch": 32, "n_ubatch": 32, "type_k": 8, "type_v": 8, "desc": "n_ctx=2048, batch=32/32, q8_0 KV (safe ctx test)", "notes": "safe_ctx"},
+  {"exp": 69, "n_gpu": 16, "n_ctx": 4096, "n_batch": 32, "n_ubatch": 32, "type_k": 8, "type_v": 8, "desc": "n_ctx=4096, batch=32/32, q8_0 KV (safe ctx test)", "notes": "safe_ctx"},
+  {"exp": 70, "n_gpu": 16, "n_ctx": 8192, "n_batch": 32, "n_ubatch": 32, "type_k": 8, "type_v": 8, "long_prompt": true, "desc": "n_ctx=8192, batch=32/32, q8_0 KV (safe ctx, long prompt)", "notes": "safe_ctx_long", "timeout": 360},
+  {"exp": 71, "n_gpu": 16, "n_ctx": 16384, "n_batch": 32, "n_ubatch": 32, "type_k": 8, "type_v": 8, "long_prompt": true, "desc": "n_ctx=16384, batch=32/32, q8_0 KV (safe ctx, long prompt)", "notes": "safe_ctx_long", "timeout": 360},
+
+  {"exp": 72, "n_gpu": 16, "n_ctx": 8192, "n_batch": 32, "n_ubatch": 32, "type_k": 2, "type_v": 2, "long_prompt": true, "desc": "n_ctx=8192, batch=32/32, q4_0 KV (min VRAM ctx)", "notes": "min_vram_ctx", "timeout": 360},
+  {"exp": 73, "n_gpu": 16, "n_ctx": 16384, "n_batch": 32, "n_ubatch": 32, "type_k": 2, "type_v": 2, "long_prompt": true, "desc": "n_ctx=16384, batch=32/32, q4_0 KV (min VRAM ctx)", "notes": "min_vram_ctx", "timeout": 360},
+  {"exp": 74, "n_gpu": 16, "n_ctx": 32768, "n_batch": 32, "n_ubatch": 32, "type_k": 2, "type_v": 2, "long_prompt": true, "desc": "n_ctx=32768, batch=32/32, q4_0 KV (max ctx)", "notes": "max_ctx", "timeout": 420},
+
+  {"exp": 75, "n_gpu": 16, "n_ctx": 512, "n_batch": 64, "n_ubatch": 96, "type_k": 8, "type_v": 8, "desc": "batch=64/96, q8_0 KV, n_gpu=16", "notes": "ubatch_tune"},
+  {"exp": 76, "n_gpu": 16, "n_ctx": 512, "n_batch": 64, "n_ubatch": 192, "type_k": 8, "type_v": 8, "desc": "batch=64/192, q8_0 KV, n_gpu=16", "notes": "ubatch_tune"},
+  {"exp": 77, "n_gpu": 16, "n_ctx": 512, "n_batch": 96, "n_ubatch": 128, "type_k": 8, "type_v": 8, "desc": "batch=96/128, q8_0 KV, n_gpu=16", "notes": "ubatch_tune"},
+  {"exp": 78, "n_gpu": 16, "n_ctx": 512, "n_batch": 96, "n_ubatch": 96, "type_k": 8, "type_v": 8, "op_offload": true, "desc": "batch=96/96+op_offload, q8_0 KV, n_gpu=16", "notes": "combo2"},
+
+  {"exp": 79, "n_gpu": 16, "n_ctx": 512, "n_batch": 64, "n_ubatch": 128, "type_k": 20, "type_v": 20, "desc": "batch64/128, iq4_nl KV, n_gpu=16", "notes": "best_batch+iq4nl"},
+  {"exp": 80, "n_gpu": 16, "n_ctx": 512, "n_batch": 96, "n_ubatch": 128, "type_k": 8, "type_v": 8, "desc": "batch=96/128, q8_0 KV, n_gpu=16", "notes": "batch_explore"},
+  {"exp": 81, "n_gpu": 16, "n_ctx": 512, "n_batch": 48, "n_ubatch": 128, "type_k": 8, "type_v": 8, "desc": "batch=48/128, q8_0 KV, n_gpu=16", "notes": "batch_explore"},
+  {"exp": 82, "n_gpu": 16, "n_ctx": 512, "n_batch": 32, "n_ubatch": 128, "type_k": 8, "type_v": 8, "desc": "batch=32/128, q8_0 KV, n_gpu=16", "notes": "batch_explore"},
+
+  {"exp": 83, "n_gpu": 15, "n_ctx": 512, "n_batch": 64, "n_ubatch": 128, "type_k": 8, "type_v": 8, "desc": "n_gpu=15, batch=64/128, q8_0 KV", "notes": "n_gpu15"},
+  {"exp": 84, "n_gpu": 15, "n_ctx": 512, "n_batch": 64, "n_ubatch": 64, "type_k": 8, "type_v": 8, "desc": "n_gpu=15, batch=64/64, q8_0 KV", "notes": "n_gpu15"},
+
+  {"exp": 85, "n_gpu": 16, "n_ctx": 512, "n_batch": 64, "n_ubatch": 128, "type_k": 8, "type_v": 8, "desc": "retest best 4 (variance)", "notes": "variance"},
+  {"exp": 86, "n_gpu": 16, "n_ctx": 512, "n_batch": 64, "n_ubatch": 128, "type_k": 8, "type_v": 8, "desc": "retest best 5 (variance)", "notes": "variance"}
+]

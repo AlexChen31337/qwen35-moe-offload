@@ -107,3 +107,20 @@ exp	tok_per_sec	vram_peak_mb	n_ctx	type_k	type_v	flash_attn	n_gpu_layers	n_batch
 103	8.593	5263	262144	q4_0	q4_0	True	8	64	64	n_ctx_262144_n_gpu8	ok	n_gpu=8, batch=64/64, q4_0 KV, n_ctx=262144 — FULL 256K context on 8GB GPU!
 104	9.055	6147	262144	q4_0	q4_0	True	10	64	64	n_ctx_262144_n_gpu10	ok	n_gpu=10, batch=64/64, q4_0 KV, n_ctx=262144
 105	8.422	6895	262144	q4_0	q4_0	True	12	64	64	n_ctx_262144_n_gpu12	ok	n_gpu=12, batch=64/64, q4_0 KV, n_ctx=262144 — n_gpu=10 is sweet spot
+106	0.000	0	8192	q8_0	q8_0	True	16	64	64	long_prompt_8192	crash	n_gpu=16, batch=64/64, q8_0 KV, n_ctx=8192, long_prompt — CUDA OOM in flash_attn
+107	1.813	7090	8192	q8_0	q8_0	True	14	64	64	long_prompt_8192_n14	ok	n_gpu=14, batch=64/64, q8_0 KV, n_ctx=8192, long_prompt — prompt-heavy workload
+108	1.903	7814	8192	q4_0	q4_0	True	16	64	64	long_prompt_8192_q4_0	ok	n_gpu=16, batch=64/64, q4_0 KV, n_ctx=8192, long_prompt
+109	4.729	7484	8192	q8_0	q8_0	True	14	512	512	long_prompt_batch512	ok	n_gpu=14, batch=512/512, q8_0 KV, n_ctx=8192, long_prompt — 2.6x faster with large batch
+110	0.000	0	8192	q8_0	q8_0	True	14	1024	1024	long_prompt_batch1024	crash	n_gpu=14, batch=1024/1024, q8_0 KV, n_ctx=8192, long_prompt — CUDA OOM
+111	0.000	0	8192	q4_0	q4_0	True	16	512	512	long_prompt_batch512_n16	oom	n_gpu=16, batch=512/512, q4_0 KV, n_ctx=8192, long_prompt — context creation OOM
+112	5.712	7148	8192	q8_0	q8_0	True	12	1024	1024	long_prompt_batch1024_n12	ok	n_gpu=12, batch=1024/1024, q8_0 KV, n_ctx=8192, long_prompt — fastest long prompt yet!
+113	4.787	7412	8192	q8_0	q8_0	True	10	2048	2048	long_prompt_batch2048_n10	ok	n_gpu=10, batch=2048/2048, q8_0 KV, n_ctx=8192, long_prompt — slower than batch1024/n12
+114	1.863	7085	8192	q8_0	q8_0	True	14	512	64	long_prompt_asym	ok	n_gpu=14, batch=512/ubatch=64, q8_0 KV, n_ctx=8192, long_prompt — ubatch=64 is bottleneck
+115	4.597	7143	8192	q8_0	q8_0	True	12	2048	1024	long_prompt_asym2	ok	n_gpu=12, batch=2048/ubatch=1024, q8_0 KV, n_ctx=8192, long_prompt
+116	5.252	7515	8192	q8_0	q8_0	True	13	1024	1024	long_prompt_batch1024_n13	ok	n_gpu=13, batch=1024/1024, q8_0 KV, n_ctx=8192, long_prompt — n_gpu=12 still best
+117	10.500	7695	512	q5_0	q5_0	True	16	64	64	q5_0_kv	ok	n_gpu=16, batch=64/64, q5_0 KV, n_ctx=512 — slower than q8_0 (11.8)
+118	10.216	7695	512	q5_1	q5_1	True	16	64	64	q5_1_kv	ok	n_gpu=16, batch=64/64, q5_1 KV, n_ctx=512 — slower than q5_0 (10.5)
+119	0.000	0	512	q4_k	q4_k	True	16	64	64	q4_k_kv	crash	n_gpu=16, batch=64/64, q4_k KV, n_ctx=512 — SIGABRT during context creation
+120	11.501	7695	512	iq4_nl	iq4_nl	True	16	64	64	iq4_nl_kv	ok	n_gpu=16, batch=64/64, iq4_nl KV, n_ctx=512 — near q8_0 speed with 4-bit KV!
+121	11.369	7767	32768	iq4_nl	iq4_nl	True	16	64	64	iq4_nl_kv_32768	ok	n_gpu=16, batch=64/64, iq4_nl KV, n_ctx=32768
+122	9.752	7093	65536	iq4_nl	iq4_nl	True	14	64	64	iq4_nl_kv_65536	ok	n_gpu=14, batch=64/64, iq4_nl KV, n_ctx=65536
