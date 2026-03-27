@@ -65,3 +65,28 @@ Never. Hardware physically stops you.
 - **Quantization of weights (not KV)**: try Q2_K, Q4_K_M variants — different GGUF files
 - **Flash attention variants**: try different flash_attn implementations
 - Agent decides — no ceiling, no targets, hardware sets the limit
+
+## PRIMARY BENCHMARK TOOL: Rust Binary (NOT Python)
+The Rust FFI benchmark crate is built and verified. USE IT for all experiments.
+
+```bash
+cd /tmp/qwen35-moe-offload
+export PATH="$HOME/.cargo/bin:$PATH"
+export LD_LIBRARY_PATH=/tmp/llama-cpp-build
+
+# Build (only needed once)
+cargo build -p bench --release 2>&1 | tail -3
+
+# Run experiment
+./target/release/bench \
+  --model /tmp/qwen35-moe-offload/models/Qwen3.5-35B-A3B-Q3_K_M.gguf \
+  --n-gpu 16 --n-ctx 512 --n-batch 256 --n-ubatch 64 \
+  --kv-type q8_0 --flash-attn --n-threads 12 --gen 256
+
+# Check available args
+./target/release/bench --help
+```
+
+**Why Rust:** Calls libllama.so directly via C FFI. Zero Python overhead. Nanosecond-precision timing. libllama.so is at /tmp/llama-cpp-build/libllama.so (CUDA-enabled, links libcublas.so.13).
+
+**Python fallback:** Only use bench_kv.py if Rust binary fails to build or crashes. Never use Python as primary measurement tool.
