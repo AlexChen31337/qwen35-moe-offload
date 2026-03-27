@@ -29,3 +29,22 @@ exp_id	tok_s	vram_mb	n_ctx	kv_type_k	kv_type_v	flash_attn	n_gpu	n_batch	n_ubatch
 28	0.000	0	512	q4_0	q4_0	True	26	252	94	p11_iq2m_gpu26_q4kv	crash	Failed to load model
 29	21.621	7573	512	q8_0	q8_0	True	24	252	94	p11_iq2m_gpu24_opoff	ok	n_gpu=24, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=21.305tok/s internal=21.621tok/s, gen=264, t_eval=12164.0ms
 30\t0.000\t0\t512\tq8_0\tq8_0\tTrue\t25\t252\t94\tp11_iq2m_gpu25_opoff\tcrash\tn_gpu=25 + op_offload = OOM/crash
+31	20.080	7575	512	q8_0	q8_0	True	24	300	110	p11_iq2m_b300_110	ok	n_gpu=24, batch=300/110, q8_0 KV, n_ctx=512, flash=1 — wall=19.765tok/s internal=20.080tok/s, gen=264, t_eval=13097.7ms
+32	19.792	7571	512	q8_0	q8_0	True	24	200	80	p11_iq2m_b200_80	ok	n_gpu=24, batch=200/80, q8_0 KV, n_ctx=512, flash=1 — wall=19.489tok/s internal=19.792tok/s, gen=264, t_eval=13288.3ms
+33	19.301	7573	512	q8_0	q8_0	True	24	252	94	p11_iq2m_thr8	ok	n_gpu=24, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=19.022tok/s internal=19.301tok/s, gen=264, t_eval=13626.1ms
+34	18.088	7573	512	q8_0	q8_0	True	24	252	94	p11_iq2m_thr14	ok	n_gpu=24, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=17.819tok/s internal=18.088tok/s, gen=264, t_eval=14539.7ms
+35	20.203	7577	1024	q8_0	q8_0	True	24	252	94	p11_iq2m_ngen512	ok	n_gpu=24, batch=252/94, q8_0 KV, n_ctx=1024, flash=1 — wall=19.885tok/s internal=20.203tok/s, gen=512, t_eval=25293.0ms
+36	20.893	7573	512	q8_0	q8_0	True	24	252	94	p11_iq2m_best_r1	ok	n_gpu=24, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=20.567tok/s internal=20.893tok/s, gen=264, t_eval=12588.2ms
+37	21.127	7573	512	q8_0	q8_0	True	24	252	94	p11_iq2m_best_r2	ok	n_gpu=24, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=20.770tok/s internal=21.127tok/s, gen=264, t_eval=12448.7ms
+38	20.816	7573	512	q8_0	q8_0	True	24	252	94	p11_iq2m_best_r3	ok	n_gpu=24, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=20.487tok/s internal=20.816tok/s, gen=264, t_eval=12634.8ms
+39	15.924	7573	512	q8_0	q8_0	True	24	252	94	p11_iq2m_ngen128	ok	n_gpu=24, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=15.715tok/s internal=15.924tok/s, gen=128, t_eval=7975.1ms
+40	16.904	7573	512	q8_0	q8_0	True	24	252	94	p11_iq2m_ngen384	ok	n_gpu=24, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=16.669tok/s internal=16.904tok/s, gen=384, t_eval=22657.0ms
+41	0.000	0	512	q8_0	q8_0	True	24	252	94	p11_iq3s_gpu24_opoff	crash	Failed to load model
+42	15.223	7590	512	q8_0	q8_0	True	20	252	94	p11_iq3s_gpu20_opoff	ok	n_gpu=20, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=15.044tok/s internal=15.223tok/s, gen=264, t_eval=17276.6ms
+43	0.000	0	512	q8_0	q8_0	True	22	252	94	p11_iq3s_gpu22_opoff	crash	Failed to load model
+44	0.000	0	512	q8_0	q8_0	True	21	252	94	p11_iq3s_gpu21_opoff	oom	Failed to create context (OOM?)
+45\t0.000\t0\t512\tq8_0\tq8_0\tTrue\t21\t252\t94\tp11_iq3s_gpu21\tcrash\tIQ3_S n_gpu=21 crash during decode
+46	17.327	7574	256	q8_0	q8_0	True	24	252	94	p11_iq2m_ctx256	ok	n_gpu=24, batch=252/94, q8_0 KV, n_ctx=256, flash=1 — wall=17.091tok/s internal=17.327tok/s, gen=200, t_eval=11484.9ms
+47	15.413	7580	512	f16	f16	True	24	252	94	p11_iq2m_f16kv	ok	n_gpu=24, batch=252/94, f16 KV, n_ctx=512, flash=1 — wall=15.228tok/s internal=15.413tok/s, gen=264, t_eval=17063.4ms
+48	17.718	7586	512	q8_0	q8_0	True	24	252	94	p11_iq2m_nommap	ok	n_gpu=24, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=17.443tok/s internal=17.718tok/s, gen=264, t_eval=14843.7ms
+49	20.102	7578	512	q8_0	q8_0	True	24	252	94	p11_iq2m_mlock	ok	n_gpu=24, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=19.791tok/s internal=20.102tok/s, gen=264, t_eval=13083.5ms
