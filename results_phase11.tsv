@@ -1,0 +1,11 @@
+exp_id	tok_s	vram_mb	n_ctx	kv_type_k	kv_type_v	flash_attn	n_gpu	n_batch	n_ubatch	label	status	notes
+1	11.475	7691	512	q8_0	q8_0	True	17	252	94	p11_baseline_r1	ok	n_gpu=17, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=11.378tok/s internal=11.475tok/s, gen=264, t_eval=22918.6ms
+2	11.216	7691	512	q8_0	q8_0	True	17	252	94	p11_baseline_r2	ok	n_gpu=17, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=11.110tok/s internal=11.216tok/s, gen=264, t_eval=23449.2ms
+3	10.964	7691	512	q8_0	q8_0	True	17	252	94	p11_baseline_r3	ok	n_gpu=17, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=10.865tok/s internal=10.964tok/s, gen=264, t_eval=23987.1ms
+4	11.495	7751	512	q8_0	q8_0	True	17	252	94	p11_op_offload	ok	n_gpu=17, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=11.391tok/s internal=11.495tok/s, gen=264, t_eval=22880.3ms
+5	10.926	7712	512	q8_0	q8_0	True	17	252	94	p11_nommap_mlock	ok	n_gpu=17, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=10.822tok/s internal=10.926tok/s, gen=264, t_eval=24071.0ms
+6	10.835	7692	512	q4_0	q4_0	True	17	252	94	p11_q4kv	ok	n_gpu=17, batch=252/94, q4_0 KV, n_ctx=512, flash=1 — wall=10.747tok/s internal=10.835tok/s, gen=264, t_eval=24272.8ms
+7	9.757	7696	512	q8_0	q8_0	True	17	252	94	p11_tbatch22	ok	n_gpu=17, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=9.675tok/s internal=9.757tok/s, gen=264, t_eval=26954.8ms
+8	9.760	7696	512	q8_0	q8_0	True	17	252	94	p11_tbatch6	ok	n_gpu=17, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=9.691tok/s internal=9.760tok/s, gen=264, t_eval=26947.2ms
+9	10.551	7772	512	q8_0	q8_0	True	17	252	94	p11_opoff_nommap	ok	n_gpu=17, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=10.443tok/s internal=10.551tok/s, gen=264, t_eval=24926.4ms
+10	11.032	7692	512	q5_0	q5_0	True	17	252	94	p11_q5kv	ok	n_gpu=17, batch=252/94, q5_0 KV, n_ctx=512, flash=1 — wall=10.935tok/s internal=11.032tok/s, gen=264, t_eval=23839.8ms
