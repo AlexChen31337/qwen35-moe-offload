@@ -9,3 +9,8 @@ exp_id	tok_s	vram_mb	n_ctx	kv_type_k	kv_type_v	flash_attn	n_gpu	n_batch	n_ubatch
 8	7.882	6211	512	q8_0	q8_0	True	12	64	64	ngpu_sweep_12	ok	n_gpu=12, batch=64/64, q8_0 KV, n_ctx=512, flash=1 — wall=7.850tok/s internal=7.882tok/s, gen=128, t_eval=16113.3ms
 9	6.539	5463	512	q8_0	q8_0	True	10	64	64	ngpu_sweep_10	ok	n_gpu=10, batch=64/64, q8_0 KV, n_ctx=512, flash=1 — wall=6.519tok/s internal=6.539tok/s, gen=128, t_eval=19423.3ms
 10	6.957	4723	512	q8_0	q8_0	True	8	64	64	ngpu_sweep_8	ok	n_gpu=8, batch=64/64, q8_0 KV, n_ctx=512, flash=1 — wall=6.929tok/s internal=6.957tok/s, gen=128, t_eval=18254.1ms
+11	8.442	7699	512	q8_0	q8_0	True	16	32	32	batch_32_32	ok	n_gpu=16, batch=32/32, q8_0 KV, n_ctx=512, flash=1 — wall=8.378tok/s internal=8.442tok/s, gen=128, t_eval=15044.7ms
+12	8.976	7701	512	q8_0	q8_0	True	16	48	48	batch_48_48	ok	n_gpu=16, batch=48/48, q8_0 KV, n_ctx=512, flash=1 — wall=8.861tok/s internal=8.976tok/s, gen=128, t_eval=14149.2ms
+13	8.941	7703	512	q8_0	q8_0	True	16	96	96	batch_96_96	ok	n_gpu=16, batch=96/96, q8_0 KV, n_ctx=512, flash=1 — wall=8.894tok/s internal=8.941tok/s, gen=128, t_eval=14204.9ms
+14	9.016	7711	512	q8_0	q8_0	True	16	128	128	batch_128_128	ok	n_gpu=16, batch=128/128, q8_0 KV, n_ctx=512, flash=1 — wall=8.983tok/s internal=9.016tok/s, gen=128, t_eval=14086.7ms
+15	8.719	7805	512	q8_0	q8_0	True	16	256	256	batch_256_256	ok	n_gpu=16, batch=256/256, q8_0 KV, n_ctx=512, flash=1 — wall=8.678tok/s internal=8.719tok/s, gen=128, t_eval=14565.2ms
