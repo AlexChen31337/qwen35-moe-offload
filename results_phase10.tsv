@@ -1,0 +1,10 @@
+exp_id	tok_s	vram_mb	n_ctx	kv_type_k	kv_type_v	flash_attn	n_gpu	n_batch	n_ubatch	label	status	notes
+1	0.000	0	512	q8_0	q8_0	False	16	252	94	p10_noflash	oom	Failed to create context (OOM?)
+2	12.331	7751	512	q8_0	q8_0	True	17	252	94	p10_ngpu17	ok	n_gpu=17, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=12.214tok/s internal=12.331tok/s, gen=264, t_eval=21327.8ms
+3	0.000	0	512	q8_0	q8_0	True	18	252	94	p10_ngpu18	crash	Failed to load model
+4	12.066	7751	512	f16	f16	True	17	252	94	p10_ngpu17_f16kv	ok	n_gpu=17, batch=252/94, f16 KV, n_ctx=512, flash=1 — wall=11.957tok/s internal=12.066tok/s, gen=264, t_eval=21797.0ms
+5	12.205	7757	512	q8_0	q8_0	True	17	280	100	p10_ngpu17_batch280	ok	n_gpu=17, batch=280/100, q8_0 KV, n_ctx=512, flash=1 — wall=12.097tok/s internal=12.205tok/s, gen=264, t_eval=21549.2ms
+6	12.264	7749	512	q8_0	q8_0	True	17	240	90	p10_ngpu17_batch240	ok	n_gpu=17, batch=240/90, q8_0 KV, n_ctx=512, flash=1 — wall=12.163tok/s internal=12.264tok/s, gen=264, t_eval=21444.2ms
+8	12.043	7751	256	q8_0	q8_0	True	17	252	94	p10_ngpu17_ctx256	ok	n_gpu=17, batch=252/94, q8_0 KV, n_ctx=256, flash=1 — wall=11.954tok/s internal=12.043tok/s, gen=128, t_eval=10546.0ms
+9	12.268	7751	512	q8_0	q8_0	True	17	252	94	p10_ngpu17_thr9	ok	n_gpu=17, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=12.177tok/s internal=12.268tok/s, gen=264, t_eval=21438.2ms
+10	11.242	7751	512	q8_0	q8_0	True	17	252	94	p10_ngpu17_thr13	ok	n_gpu=17, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=11.151tok/s internal=11.242tok/s, gen=264, t_eval=23394.2ms
