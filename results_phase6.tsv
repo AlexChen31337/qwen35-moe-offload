@@ -19,3 +19,8 @@ exp_id	tok_s	vram_mb	n_ctx	kv_type_k	kv_type_v	flash_attn	n_gpu	n_batch	n_ubatch
 18	9.598	7701	512	q8_0	q8_0	True	16	96	64	batch_96_64	ok	n_gpu=16, batch=96/64, q8_0 KV, n_ctx=512, flash=1 — wall=9.553tok/s internal=9.598tok/s, gen=128, t_eval=13232.1ms
 19	10.437	7699	512	q8_0	q8_0	True	16	128	32	batch_128_32	ok	n_gpu=16, batch=128/32, q8_0 KV, n_ctx=512, flash=1 — wall=10.381tok/s internal=10.437tok/s, gen=128, t_eval=12167.9ms
 20	9.529	7701	512	f16	f16	True	16	64	64	kv_f16	ok	n_gpu=16, batch=64/64, f16 KV, n_ctx=512, flash=1 — wall=9.478tok/s internal=9.529tok/s, gen=128, t_eval=13327.9ms
+21	8.968	7697	512	q4_0	q4_0	True	16	64	64	kv_q4_0	ok	n_gpu=16, batch=64/64, q4_0 KV, n_ctx=512, flash=1 — wall=8.925tok/s internal=8.968tok/s, gen=128, t_eval=14161.4ms
+22	9.226	7695	512	q5_0	q5_0	True	16	64	64	kv_q5_0	ok	n_gpu=16, batch=64/64, q5_0 KV, n_ctx=512, flash=1 — wall=9.155tok/s internal=9.226tok/s, gen=128, t_eval=13766.0ms
+23	9.080	7695	512	iq4_nl	iq4_nl	True	16	64	64	kv_iq4_nl	ok	n_gpu=16, batch=64/64, iq4_nl KV, n_ctx=512, flash=1 — wall=9.030tok/s internal=9.080tok/s, gen=128, t_eval=13986.9ms
+24	9.048	7705	512	f32	f32	True	16	64	64	kv_f32	ok	n_gpu=16, batch=64/64, f32 KV, n_ctx=512, flash=1 — wall=8.975tok/s internal=9.048tok/s, gen=128, t_eval=14036.0ms
+25	0.000	0	512	q8_0	q8_0	False	16	64	64	no_flash	oom	Failed to create context (OOM?)
