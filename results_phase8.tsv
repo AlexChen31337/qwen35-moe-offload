@@ -1,0 +1,57 @@
+exp_id	tok_s	vram_mb	n_ctx	kv_type_k	kv_type_v	flash_attn	n_gpu	n_batch	n_ubatch	n_threads	gen_tokens	label	status	notes
+1	10.639	7700	512	q8_0	q8_0	True	16	256	64	12	256	reproduce_best_r1	ok	n_gpu=16, batch=256/64, q8_0 KV, n_ctx=512, flash=1 — wall=10.639tok/s, gen=256, t_eval=24060.0ms, threads=12
+2	11.267	7700	512	q8_0	q8_0	True	16	256	64	12	256	reproduce_best_r2	ok	n_gpu=16, batch=256/64, q8_0 KV, n_ctx=512, flash=1 — wall=11.267tok/s, gen=256, t_eval=22720.0ms, threads=12
+3	11.080	7700	512	q8_0	q8_0	True	16	256	64	12	256	reproduce_best_r3	ok	n_gpu=16, batch=256/64, q8_0 KV, n_ctx=512, flash=1 — wall=11.080tok/s, gen=256, t_eval=23100.0ms, threads=12
+4	11.313	7700	512	q8_0	q8_0	True	16	256	64	12	512	gen512_b256_64_r1	ok	n_gpu=16, batch=256/64, q8_0 KV, n_ctx=512, flash=1 — wall=11.313tok/s, gen=512, t_eval=44020.0ms, threads=12
+5	11.511	7700	512	q8_0	q8_0	True	16	256	64	12	512	gen512_b256_64_r2	ok	n_gpu=16, batch=256/64, q8_0 KV, n_ctx=512, flash=1 — wall=11.511tok/s, gen=512, t_eval=43260.0ms, threads=12
+6	10.995	7700	512	q8_0	q8_0	True	16	256	64	12	1024	gen1024_b256_64_r1	ok	n_gpu=16, batch=256/64, q8_0 KV, n_ctx=512, flash=1 — wall=10.995tok/s, gen=1024, t_eval=45290.0ms, threads=12
+7	11.615	7700	512	q8_0	q8_0	True	16	256	64	12	1024	gen1024_b256_64_r2	ok	n_gpu=16, batch=256/64, q8_0 KV, n_ctx=512, flash=1 — wall=11.615tok/s, gen=1024, t_eval=42880.0ms, threads=12
+8	0.000	0	512	q8_0	q8_0	True	17	256	64	12	256	ngpu17_b256_64	crash	Failed to load model from file: models/Qwen3.5-35B-A3B-Q3_K_M.gguf
+9	11.165	7700	512	q8_0	q8_0	True	16	512	64	12	256	b512_64	ok	n_gpu=16, batch=512/64, q8_0 KV, n_ctx=512, flash=1 — wall=11.165tok/s, gen=256, t_eval=22930.0ms, threads=12
+10	11.367	7710	512	q8_0	q8_0	True	16	512	128	12	256	b512_128	ok	n_gpu=16, batch=512/128, q8_0 KV, n_ctx=512, flash=1 — wall=11.367tok/s, gen=256, t_eval=22520.0ms, threads=12
+11	11.255	7703	512	q8_0	q8_0	True	16	256	32	12	256	b256_32	ok	n_gpu=16, batch=256/32, q8_0 KV, n_ctx=512, flash=1 — wall=11.255tok/s, gen=256, t_eval=22740.0ms, threads=12
+12	10.999	7715	512	q8_0	q8_0	True	16	256	128	12	256	b256_128	ok	n_gpu=16, batch=256/128, q8_0 KV, n_ctx=512, flash=1 — wall=10.999tok/s, gen=256, t_eval=23270.0ms, threads=12
+13	11.081	7703	512	q8_0	q8_0	True	16	128	32	12	256	b128_32	ok	n_gpu=16, batch=128/32, q8_0 KV, n_ctx=512, flash=1 — wall=11.081tok/s, gen=256, t_eval=23100.0ms, threads=12
+14	11.099	7715	512	q8_0	q8_0	True	16	128	128	12	256	b128_128	ok	n_gpu=16, batch=128/128, q8_0 KV, n_ctx=512, flash=1 — wall=11.099tok/s, gen=256, t_eval=23070.0ms, threads=12
+15	10.836	7705	512	q8_0	q8_0	True	16	384	64	12	256	b384_64	ok	n_gpu=16, batch=384/64, q8_0 KV, n_ctx=512, flash=1 — wall=10.836tok/s, gen=256, t_eval=23620.0ms, threads=12
+16	10.642	7715	512	q8_0	q8_0	True	16	384	128	12	256	b384_128	ok	n_gpu=16, batch=384/128, q8_0 KV, n_ctx=512, flash=1 — wall=10.642tok/s, gen=256, t_eval=24060.0ms, threads=12
+17	11.408	7705	512	q8_0	q8_0	True	16	192	64	12	256	b192_64	ok	n_gpu=16, batch=192/64, q8_0 KV, n_ctx=512, flash=1 — wall=11.408tok/s, gen=256, t_eval=22440.0ms, threads=12
+18	10.790	7707	512	q8_0	q8_0	True	16	192	96	12	256	b192_96	ok	n_gpu=16, batch=192/96, q8_0 KV, n_ctx=512, flash=1 — wall=10.790tok/s, gen=256, t_eval=23730.0ms, threads=12
+19	11.215	7707	512	q8_0	q8_0	True	16	256	96	12	256	b256_96	ok	n_gpu=16, batch=256/96, q8_0 KV, n_ctx=512, flash=1 — wall=11.215tok/s, gen=256, t_eval=22830.0ms, threads=12
+20	10.850	7705	512	q8_0	q8_0	True	16	256	48	12	256	b256_48	ok	n_gpu=16, batch=256/48, q8_0 KV, n_ctx=512, flash=1 — wall=10.850tok/s, gen=256, t_eval=23590.0ms, threads=12
+21	11.194	7705	512	q8_0	q8_0	True	16	256	64	4	256	threads_4_b256_64	ok	n_gpu=16, batch=256/64, q8_0 KV, n_ctx=512, flash=1 — wall=11.194tok/s, gen=256, t_eval=22870.0ms, threads=4
+22	11.374	7705	512	q8_0	q8_0	True	16	256	64	6	256	threads_6_b256_64	ok	n_gpu=16, batch=256/64, q8_0 KV, n_ctx=512, flash=1 — wall=11.374tok/s, gen=256, t_eval=22510.0ms, threads=6
+23	10.859	7705	512	q8_0	q8_0	True	16	256	64	8	256	threads_8_b256_64	ok	n_gpu=16, batch=256/64, q8_0 KV, n_ctx=512, flash=1 — wall=10.859tok/s, gen=256, t_eval=23580.0ms, threads=8
+24	11.161	7705	512	q8_0	q8_0	True	16	256	64	10	256	threads_10_b256_64	ok	n_gpu=16, batch=256/64, q8_0 KV, n_ctx=512, flash=1 — wall=11.161tok/s, gen=256, t_eval=22940.0ms, threads=10
+25	9.853	7700	512	q8_0	q8_0	True	16	256	64	14	256	threads_14_b256_64	ok	n_gpu=16, batch=256/64, q8_0 KV, n_ctx=512, flash=1 — wall=9.853tok/s, gen=256, t_eval=25980.0ms, threads=14
+26	3.985	7700	512	q8_0	q8_0	True	16	256	64	16	256	threads_16_b256_64	ok	n_gpu=16, batch=256/64, q8_0 KV, n_ctx=512, flash=1 — wall=3.985tok/s, gen=256, t_eval=64240.0ms, threads=16
+27	8.080	7700	512	q8_0	q8_0	True	16	256	64	20	256	threads_20_b256_64	ok	n_gpu=16, batch=256/64, q8_0 KV, n_ctx=512, flash=1 — wall=8.080tok/s, gen=256, t_eval=31680.0ms, threads=20
+28	8.138	7700	512	q8_0	q8_0	True	16	256	64	24	256	threads_24_b256_64	ok	n_gpu=16, batch=256/64, q8_0 KV, n_ctx=512, flash=1 — wall=8.138tok/s, gen=256, t_eval=31460.0ms, threads=24
+29	11.190	7700	512	q8_0	q8_0	True	16	256	64	12	256	op_offload_on	ok	n_gpu=16, batch=256/64, q8_0 KV, n_ctx=512, flash=1 — wall=11.190tok/s, gen=256, t_eval=22880.0ms, threads=12
+30	11.228	7700	512	q8_0	q8_0	True	16	256	64	12	256	swa_full_on	ok	n_gpu=16, batch=256/64, q8_0 KV, n_ctx=512, flash=1 — wall=11.228tok/s, gen=256, t_eval=22800.0ms, threads=12
+31	11.006	7700	512	q8_0	q8_0	True	16	256	64	12	256	op_offload_swa_full	ok	n_gpu=16, batch=256/64, q8_0 KV, n_ctx=512, flash=1 — wall=11.006tok/s, gen=256, t_eval=23260.0ms, threads=12
+32	11.133	7696	512	q4_0	q4_0	True	16	256	64	12	256	kv_q4_0_b256_64	ok	n_gpu=16, batch=256/64, q4_0 KV, n_ctx=512, flash=1 — wall=11.133tok/s, gen=256, t_eval=22990.0ms, threads=12
+33	10.893	7692	512	q4_1	q4_1	True	16	256	64	12	256	kv_q4_1_b256_64	ok	n_gpu=16, batch=256/64, q4_1 KV, n_ctx=512, flash=1 — wall=10.893tok/s, gen=256, t_eval=23500.0ms, threads=12
+34	10.958	7692	512	q5_0	q5_0	True	16	256	64	12	256	kv_q5_0_b256_64	ok	n_gpu=16, batch=256/64, q5_0 KV, n_ctx=512, flash=1 — wall=10.958tok/s, gen=256, t_eval=23360.0ms, threads=12
+35	10.466	7692	512	q5_1	q5_1	True	16	256	64	12	256	kv_q5_1_b256_64	ok	n_gpu=16, batch=256/64, q5_1 KV, n_ctx=512, flash=1 — wall=10.466tok/s, gen=256, t_eval=24460.0ms, threads=12
+36	0.000	0	512	q4_k	q4_k	True	16	256	64	12	256	kv_q4_k_b256_64	crash	No JSON output. stderr: llama_context: n_ctx_seq (512) < n_ctx_train (262144) -- the full capacity of the model will not be utilized
+/home/runner/work/llama-cpp-python/llama-cpp-python/vendor/llama.cpp/ggml/src/ggml-backend.
+37	0.000	0	512	q5_k	q5_k	True	16	256	64	12	256	kv_q5_k_b256_64	crash	No JSON output. stderr: llama_context: n_ctx_seq (512) < n_ctx_train (262144) -- the full capacity of the model will not be utilized
+/home/runner/work/llama-cpp-python/llama-cpp-python/vendor/llama.cpp/ggml/src/ggml-backend.
+38	11.104	7692	512	iq4_nl	iq4_nl	True	16	256	64	12	256	kv_iq4_nl_b256_64	ok	n_gpu=16, batch=256/64, iq4_nl KV, n_ctx=512, flash=1 — wall=11.104tok/s, gen=256, t_eval=23060.0ms, threads=12
+39	11.136	7700	512	f16	f16	True	16	256	64	12	256	kv_f16_b256_64	ok	n_gpu=16, batch=256/64, f16 KV, n_ctx=512, flash=1 — wall=11.136tok/s, gen=256, t_eval=22990.0ms, threads=12
+40	10.803	7696	128	q8_0	q8_0	True	16	256	64	12	256	ctx128_b256_64	ok	n_gpu=16, batch=256/64, q8_0 KV, n_ctx=128, flash=1 — wall=10.803tok/s, gen=256, t_eval=22400.0ms, threads=12
+41	11.508	7696	256	q8_0	q8_0	True	16	256	64	12	256	ctx256_b256_64	ok	n_gpu=16, batch=256/64, q8_0 KV, n_ctx=256, flash=1 — wall=11.508tok/s, gen=256, t_eval=21030.0ms, threads=12
+42	11.185	7702	1024	q8_0	q8_0	True	16	256	64	12	256	ctx1024_b256_64	ok	n_gpu=16, batch=256/64, q8_0 KV, n_ctx=1024, flash=1 — wall=11.185tok/s, gen=256, t_eval=22890.0ms, threads=12
+43	9.532	7706	2048	q8_0	q8_0	True	16	256	64	12	256	ctx2048_b256_64	ok	n_gpu=16, batch=256/64, q8_0 KV, n_ctx=2048, flash=1 — wall=9.532tok/s, gen=256, t_eval=26860.0ms, threads=12
+44	0.000	0	4096	q8_0	q8_0	True	16	256	64	12	256	ctx4096_b256_64	crash	Failed to load model from file: models/Qwen3.5-35B-A3B-Q3_K_M.gguf
+45	0.000	0	8192	q8_0	q8_0	True	16	256	64	12	256	ctx8192_b256_64	crash	Failed to load model from file: models/Qwen3.5-35B-A3B-Q3_K_M.gguf
+46	0.000	0	512	q8_0	q8_0	True	16	256	64	12	512	combo_gen512	crash	Failed to load model from file: models/Qwen3.5-35B-A3B-Q3_K_M.gguf
+47	0.000	0	512	q8_0	q8_0	True	16	256	64	12	1024	combo_gen1024	crash	Failed to load model from file: models/Qwen3.5-35B-A3B-Q3_K_M.gguf
+48	0.000	0	512	q4_0	q4_0	True	16	256	64	12	256	combo_q4_0_b256	crash	Failed to load model from file: models/Qwen3.5-35B-A3B-Q3_K_M.gguf
+49	0.000	0	512	f16	f16	True	16	512	64	12	256	combo_f16_b512	crash	Failed to load model from file: models/Qwen3.5-35B-A3B-Q3_K_M.gguf
+50	0.000	0	512	q8_0	q8_0	True	16	256	64	12	256	stat_best_r1	crash	Failed to load model from file: models/Qwen3.5-35B-A3B-Q3_K_M.gguf
+51	0.000	0	512	q8_0	q8_0	True	16	256	64	12	256	stat_best_r2	crash	Failed to load model from file: models/Qwen3.5-35B-A3B-Q3_K_M.gguf
+52	0.000	0	512	q8_0	q8_0	True	16	256	64	12	256	stat_best_r3	crash	Failed to load model from file: models/Qwen3.5-35B-A3B-Q3_K_M.gguf
+53	0.000	0	512	q8_0	q8_0	True	16	256	64	12	256	stat_best_r4	crash	Failed to load model from file: models/Qwen3.5-35B-A3B-Q3_K_M.gguf
+54	0.000	0	512	q8_0	q8_0	True	16	256	64	12	256	stat_best_r5	crash	Failed to load model from file: models/Qwen3.5-35B-A3B-Q3_K_M.gguf
