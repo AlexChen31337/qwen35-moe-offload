@@ -48,3 +48,14 @@ exp_id	tok_s	vram_mb	n_ctx	kv_type_k	kv_type_v	flash_attn	n_gpu	n_batch	n_ubatch
 47	15.413	7580	512	f16	f16	True	24	252	94	p11_iq2m_f16kv	ok	n_gpu=24, batch=252/94, f16 KV, n_ctx=512, flash=1 — wall=15.228tok/s internal=15.413tok/s, gen=264, t_eval=17063.4ms
 48	17.718	7586	512	q8_0	q8_0	True	24	252	94	p11_iq2m_nommap	ok	n_gpu=24, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=17.443tok/s internal=17.718tok/s, gen=264, t_eval=14843.7ms
 49	20.102	7578	512	q8_0	q8_0	True	24	252	94	p11_iq2m_mlock	ok	n_gpu=24, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=19.791tok/s internal=20.102tok/s, gen=264, t_eval=13083.5ms
+50	20.052	7189	512	q8_0	q8_0	True	24	252	94	p11_iq2xxs_gpu24	ok	n_gpu=24, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=19.759tok/s internal=20.052tok/s, gen=264, t_eval=13116.1ms
+51	0.000	0	512	q8_0	q8_0	True	28	252	94	p11_iq2xxs_gpu28	crash	Failed to load model
+52	23.315	7669	512	q8_0	q8_0	True	26	252	94	p11_iq2xxs_gpu26	ok	n_gpu=26, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=22.909tok/s internal=23.315tok/s, gen=264, t_eval=11280.1ms
+53	0.000	0	512	q8_0	q8_0	True	27	252	94	p11_iq2xxs_gpu27	oom	Failed to create context (OOM?)
+54	0.000	0	512	q8_0	q8_0	True	27	252	94	p11_iq2xxs_gpu27_noopoff	oom	Failed to create context (OOM?)
+55	21.973	7669	512	q8_0	q8_0	True	26	252	94	p11_iq2xxs_best_r1	ok	n_gpu=26, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=21.608tok/s internal=21.973tok/s, gen=264, t_eval=11969.0ms
+56	22.309	7669	512	q8_0	q8_0	True	26	252	94	p11_iq2xxs_best_r2	ok	n_gpu=26, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=21.939tok/s internal=22.309tok/s, gen=264, t_eval=11789.1ms
+57	21.433	7669	512	q8_0	q8_0	True	26	252	94	p11_iq2xxs_best_r3	ok	n_gpu=26, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=21.067tok/s internal=21.433tok/s, gen=264, t_eval=12270.7ms
+58	23.335	7663	512	q8_0	q8_0	True	26	252	94	p11_iq2xxs_gpu26_noopoff	ok	n_gpu=26, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=22.942tok/s internal=23.335tok/s, gen=264, t_eval=11270.6ms
+59	21.453	7663	512	q8_0	q8_0	True	26	252	94	p11_iq2xxs_noopoff_r1	ok	n_gpu=26, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=21.094tok/s internal=21.453tok/s, gen=264, t_eval=12259.6ms
+60	16.893	7663	512	q8_0	q8_0	True	26	252	94	p11_iq2xxs_noopoff_r2	ok	n_gpu=26, batch=252/94, q8_0 KV, n_ctx=512, flash=1 — wall=16.634tok/s internal=16.893tok/s, gen=264, t_eval=15568.2ms
