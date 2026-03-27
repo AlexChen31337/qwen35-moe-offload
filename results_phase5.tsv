@@ -89,3 +89,21 @@ exp	tok_per_sec	vram_peak_mb	n_ctx	type_k	type_v	flash_attn	n_gpu_layers	n_batch
 85	11.868	7703	512	q8_0	q8_0	True	16	64	128	variance	discard	retest best 4 (variance)
 86	11.767	7703	512	q8_0	q8_0	True	16	64	128	variance	discard	retest best 5 (variance)
 87	10.338	7737	8192	q8_0	q8_0	True	16	64	128	n_ctx_8192_upgrade_verify	ok	n_gpu=16, batch=64/128, q8_0 KV, n_ctx=8192 — no segfault after vram clear
+88	11.363	7737	8192	q8_0	q8_0	True	16	64	64	n_ctx_8192	ok	n_gpu=16, batch=64/64, q8_0 KV, n_ctx=8192
+89	11.461	7773	16384	q8_0	q8_0	True	16	64	64	n_ctx_16384	ok	n_gpu=16, batch=64/64, q8_0 KV, n_ctx=16384
+90	11.507	7773	16384	q8_0	q8_0	True	16	64	128	n_ctx_16384	ok	n_gpu=16, batch=64/128, q8_0 KV, n_ctx=16384
+91	11.646	7775	32768	q4_0	q4_0	True	16	64	64	n_ctx_32768_q4_0	ok	n_gpu=16, batch=64/64, q4_0 KV, n_ctx=32768
+92	0.000	0	32768	q8_0	q8_0	True	16	64	64	n_ctx_32768_q8_0	crash	n_gpu=16, batch=64/64, q8_0 KV, n_ctx=32768 — SIGABRT in llama_decode (OOM crash)
+93	11.421	7799	32768	q8_0	q4_0	True	16	64	64	mixed_kv_32768	ok	n_gpu=16, batch=64/64, mixed KV q8_0 K + q4_0 V, n_ctx=32768
+94	10.346	7799	32768	q4_0	q8_0	True	16	64	64	mixed_kv_32768_rev	ok	n_gpu=16, batch=64/64, mixed KV q4_0 K + q8_0 V, n_ctx=32768 — K quant hurts more
+95	10.204	7775	32768	q4_0	q4_0	True	16	64	128	n_ctx_32768_batch	ok	n_gpu=16, batch=64/128, q4_0 KV, n_ctx=32768 — ubatch=128 slower than 64
+96	0.000	0	65536	q4_0	q4_0	True	16	64	64	n_ctx_65536_q4_0	oom	n_gpu=16, batch=64/64, q4_0 KV, n_ctx=65536 — failed to create context (OOM)
+97	9.693	6375	65536	q4_0	q4_0	True	12	64	64	n_ctx_65536_n_gpu12	ok	n_gpu=12, batch=64/64, q4_0 KV, n_ctx=65536 — max context achieved!
+98	11.190	7149	65536	q4_0	q4_0	True	14	64	64	n_ctx_65536_n_gpu14	ok	n_gpu=14, batch=64/64, q4_0 KV, n_ctx=65536 — sweet spot for 65K
+99	10.674	7521	65536	q4_0	q4_0	True	15	64	64	n_ctx_65536_n_gpu15	ok	n_gpu=15, batch=64/64, q4_0 KV, n_ctx=65536 — slower than n_gpu=14 (VRAM pressure)
+100	8.031	5693	131072	q4_0	q4_0	True	10	64	64	n_ctx_131072_n_gpu10	ok	n_gpu=10, batch=64/64, q4_0 KV, n_ctx=131072 — 128K context on 8GB!
+101	8.628	6441	131072	q4_0	q4_0	True	12	64	64	n_ctx_131072_n_gpu12	ok	n_gpu=12, batch=64/64, q4_0 KV, n_ctx=131072
+102	10.725	7251	131072	q4_0	q4_0	True	14	64	64	n_ctx_131072_n_gpu14	ok	n_gpu=14, batch=64/64, q4_0 KV, n_ctx=131072 — excellent for 128K!
+103	8.593	5263	262144	q4_0	q4_0	True	8	64	64	n_ctx_262144_n_gpu8	ok	n_gpu=8, batch=64/64, q4_0 KV, n_ctx=262144 — FULL 256K context on 8GB GPU!
+104	9.055	6147	262144	q4_0	q4_0	True	10	64	64	n_ctx_262144_n_gpu10	ok	n_gpu=10, batch=64/64, q4_0 KV, n_ctx=262144
+105	8.422	6895	262144	q4_0	q4_0	True	12	64	64	n_ctx_262144_n_gpu12	ok	n_gpu=12, batch=64/64, q4_0 KV, n_ctx=262144 — n_gpu=10 is sweet spot
