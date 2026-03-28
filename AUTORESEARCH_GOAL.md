@@ -21,8 +21,12 @@ Maximize tok/s for Qwen3.5-35B-A3B-Q3_K_M on RTX 3070 8GB. No ceiling. No predic
 If in doubt: run the experiment first, analyse after. Curiosity > caution.
 
 ## Current Best
-- **11.874 tok/s** (Phase 5, exp 9: n_gpu=16, batch=64/128, q8_0, n_ctx=512)
-- **11.850 tok/s** (Phase 4, exp 46: n_gpu=16, batch=64/64, q8_0, n_ctx=512)
+- **29.899 tok/s** (Phase 12, exp 62: IQ2_XXS, n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1, op_offload=1, threads=8)
+- **29.858 tok/s** (Phase 12, exp 65: same config, consistent replicate)
+- **28.923 tok/s** (Phase 12, exp 27: same model, threads=11)
+- **25.242 tok/s** (Phase 11, exp 69: IQ2_XXS, n_gpu=27, batch=32/16 — old ATB before Phase 12)
+- **21.621 tok/s** (Phase 11, exp 29: IQ2_M, n_gpu=24 — old ATB for IQ2_M)
+- **12.331 tok/s** (Phase 10: Q3_K_M, n_gpu=17 — best for original quant)
 
 ## Hard Facts
 - OOM ceiling: n_gpu=18 (both q8_0 and q4_0)
@@ -71,6 +75,20 @@ Never. Hardware physically stops you.
 - llama.cpp has NO API to extract/inject KV cache entries — integration wall
 - All-time best: 12.114 tok/s (Phase 6, exp 117: n_gpu=16, batch=256/64, q8_0, n_threads=12, gen=256)
 - Theoretical ceiling: 310K context at 12.09 tok/s with hybrid iq4_nl+uniform RAM offload
+
+## Phase 12 Findings (2026-03-28)
+- **NEW ALL-TIME BEST: 29.899 tok/s** (IQ2_XXS, n_gpu=27, batch=32/16, q8_0 KV, threads=8, op_offload=1)
+- IQ2_XXS (10GB) is the optimal quantization for RTX 3070 8GB — smallest model = most GPU layers = fastest
+- n_gpu=27 is the sweet spot for IQ2_XXS (28 collapses to 8 tok/s, 26 caps at ~27 tok/s)
+- threads=8 marginally beats 11 (~29.1 vs 28.9) — less CPU thread contention with high GPU offload
+- op_offload=1 is critical (+40% over op_offload=0)
+- batch=32/16 is optimal; batch=64/32 collapses to ~7 tok/s at n_gpu=27 (OOM-adjacent)
+- Q2_K_XL (12GB) only fits n_gpu=22 → 17.9 tok/s (much worse than IQ2_XXS)
+- IQ3_S (13GB) only fits n_gpu=20 → 10.8 tok/s
+- IQ2_M (11GB) at n_gpu=26 → 27.0 tok/s (good but IQ2_XXS still wins)
+- Massive variance due to concurrent system load (swerex, Ollama, other subagents) — results range 5-30 tok/s for same config
+- Ollama model keepalive can consume 700-1400MB VRAM — must unload before bench
+- Progress: 12.1 → 21.6 → 25.2 → 29.9 tok/s across Phases 6-12 (147% improvement!)
 
 ## Phase 8 Axes (unexplored — agent decides freely)
 - **llama.cpp patch**: fork llama.cpp, add KV extract/inject API, integrate uniform quant offload

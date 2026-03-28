@@ -1,0 +1,73 @@
+exp_id	model_file	n_gpu	batch_size	ubatch_size	type_k	type_v	flash_attn	op_offload	n_threads	n_ctx	n_gen	tok_s	notes
+1	27.559	7595	256	q8_0	q8_0	True	26	32	16	p12_iq2xxs_gpu26_b32	ok	n_gpu=26, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=27.030tok/s internal=27.559tok/s, gen=200, t_eval=7220.8ms
+2	26.673	6976	256	q8_0	q8_0	True	26	64	32	p12_iq2xxs_gpu26_b64	ok	n_gpu=26, batch=64/32, q8_0 KV, n_ctx=256, flash=1 — wall=26.206tok/s internal=26.673tok/s, gen=200, t_eval=7460.8ms
+3	27.308	6894	256	q8_0	q8_0	True	26	16	8	p12_iq2xxs_gpu26_b16	ok	n_gpu=26, batch=16/8, q8_0 KV, n_ctx=256, flash=1 — wall=26.795tok/s internal=27.308tok/s, gen=200, t_eval=7287.3ms
+4	26.249	6902	256	q8_0	q8_0	True	26	32	16	p12_iq2xxs_gpu26_t9	ok	n_gpu=26, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=25.773tok/s internal=26.249tok/s, gen=200, t_eval=7581.2ms
+5	26.755	6902	256	q4_0	q4_0	True	26	32	16	p12_iq2xxs_gpu26_q4kv	ok	n_gpu=26, batch=32/16, q4_0 KV, n_ctx=256, flash=1 — wall=26.270tok/s internal=26.755tok/s, gen=200, t_eval=7437.8ms
+6	27.589	6906	512	q8_0	q8_0	True	26	32	16	p12_iq2xxs_gpu26_gen400	ok	n_gpu=26, batch=32/16, q8_0 KV, n_ctx=512, flash=1 — wall=27.224tok/s internal=27.589tok/s, gen=400, t_eval=14462.0ms
+7	26.921	7146	256	q4_0	q4_0	True	27	32	16	p12_iq2xxs_gpu27_q4kv	ok	n_gpu=27, batch=32/16, q4_0 KV, n_ctx=256, flash=1 — wall=26.521tok/s internal=26.921tok/s, gen=200, t_eval=7391.9ms
+8	24.727	6906	512	q8_0	q8_0	True	26	32	16	p12_iq2xxs_gpu26_n512_gen264	ok	n_gpu=26, batch=32/16, q8_0 KV, n_ctx=512, flash=1 — wall=24.270tok/s internal=24.727tok/s, gen=264, t_eval=10636.4ms
+9	26.837	6902	256	q8_0	q8_0	True	26	32	16	p12_iq2xxs_gpu26_r2	ok	n_gpu=26, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=26.325tok/s internal=26.837tok/s, gen=200, t_eval=7415.3ms
+10	26.767	6906	512	q8_0	q8_0	True	26	32	16	p12_iq2xxs_gpu26_gen400_r2	ok	n_gpu=26, batch=32/16, q8_0 KV, n_ctx=512, flash=1 — wall=26.265tok/s internal=26.767tok/s, gen=400, t_eval=14906.6ms
+11	23.390	7595	128	q8_0	q8_0	True	26	32	16	p12_iq2xxs_gpu26_ctx128	ok	n_gpu=26, batch=32/16, q8_0 KV, n_ctx=128, flash=1 — wall=23.043tok/s internal=23.390tok/s, gen=100, t_eval=4232.6ms
+12	23.764	7599	512	q8_0	q8_0	True	26	32	16	p12_iq2xxs_gpu26_gen400_t9	ok	n_gpu=26, batch=32/16, q8_0 KV, n_ctx=512, flash=1 — wall=23.420tok/s internal=23.764tok/s, gen=400, t_eval=16790.1ms
+13	17.927	7599	512	q8_0	q8_0	True	26	32	16	p12_iq2xxs_gpu26_gen512	ok	n_gpu=26, batch=32/16, q8_0 KV, n_ctx=512, flash=1 — wall=17.700tok/s internal=17.927tok/s, gen=508, t_eval=28281.4ms
+14	0.000	0	256	q8_0	q8_0	True	26	32	16	p12_q2k_gpu26_b32	crash	Failed to load model
+15	0.000	0	256	q8_0	q8_0	True	24	32	16	p12_q2k_gpu24_b32	oom	Failed to create context (OOM?)
+16	17.962	7301	256	q4_0	q4_0	True	22	32	16	p12_q2k_gpu22_q4kv	ok	n_gpu=22, batch=32/16, q4_0 KV, n_ctx=256, flash=1 — wall=17.747tok/s internal=17.962tok/s, gen=200, t_eval=11078.8ms
+17	0.000	0	128	q4_0	q4_0	True	24	16	8	p12_q2k_gpu24_ctx128_q4kv	oom	Failed to create context (OOM?)
+18	16.444	6757	256	q8_0	q8_0	True	20	32	16	p12_q2k_gpu20_q8kv	ok	n_gpu=20, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=16.272tok/s internal=16.444tok/s, gen=200, t_eval=12102.0ms
+19	0.000	0	128	q4_0	q4_0	True	27	16	8	p12_iq2xxs_gpu27_ctx128_q4kv_noopoff	oom	Failed to create context (OOM?)
+20	0.000	0	256	q8_0	q8_0	True	24	32	16	p12_iq3s_gpu24	crash	Failed to load model
+21	10.839	7357	256	q8_0	q8_0	True	20	32	16	p12_iq3s_gpu20	ok	n_gpu=20, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=10.758tok/s internal=10.839tok/s, gen=200, t_eval=18360.5ms
+22	10.175	7479	256	q8_0	q8_0	True	26	32	24	p12_iq2xxs_gpu26_b32_u24	ok	n_gpu=26, batch=32/24, q8_0 KV, n_ctx=256, flash=1 — wall=10.127tok/s internal=10.175tok/s, gen=200, t_eval=19556.9ms
+23	9.338	7461	256	q8_0	q8_0	True	26	32	16	p12_iq2xxs_gpu26_r3	ok	n_gpu=26, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=9.267tok/s internal=9.338tok/s, gen=200, t_eval=21311.7ms
+24	0.000	0	256	q8_0	q8_0	True	26	32	16	p12_iq2xxs_gpu26_stability_24	crash	Failed to load model
+25	0.000	0	256	q8_0	q8_0	True	26	32	16	p12_iq2xxs_gpu26_stability_25	crash	Failed to load model
+26	0.000	0	256	q8_0	q8_0	True	26	32	16	p12_iq2xxs_gpu26_stability_26	crash	Failed to load model
+27	28.923	7146	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_cleanvram	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=28.362tok/s internal=28.923tok/s, gen=200, t_eval=6880.4ms
+28	8.125	7722	256	q8_0	q8_0	True	28	32	16	p12_iq2xxs_gpu28	ok	n_gpu=28, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=8.098tok/s internal=8.125tok/s, gen=200, t_eval=24493.4ms
+29	15.170	7482	512	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_gen400	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=512, flash=1 — wall=15.022tok/s internal=15.170tok/s, gen=400, t_eval=26301.4ms
+30	18.351	7478	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_gen400_ctx256	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=18.155tok/s internal=18.351tok/s, gen=252, t_eval=13677.9ms
+31	5.375	7319	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_r2	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=5.370tok/s internal=5.375tok/s, gen=200, t_eval=37020.7ms
+32	6.861	7319	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_clean	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=6.849tok/s internal=6.861tok/s, gen=200, t_eval=29004.4ms
+33	28.702	7319	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_r3	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=28.288tok/s internal=28.702tok/s, gen=200, t_eval=6933.3ms
+34	28.482	7319	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_r4	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=27.931tok/s internal=28.482tok/s, gen=200, t_eval=6986.8ms
+35	6.971	7393	256	q8_0	q8_0	True	27	64	32	p12_iq2xxs_gpu27_b64	ok	n_gpu=27, batch=64/32, q8_0 KV, n_ctx=256, flash=1 — wall=6.912tok/s internal=6.971tok/s, gen=200, t_eval=28547.9ms
+36	28.239	7311	256	q8_0	q8_0	True	27	16	8	p12_iq2xxs_gpu27_b16	ok	n_gpu=27, batch=16/8, q8_0 KV, n_ctx=256, flash=1 — wall=27.698tok/s internal=28.239tok/s, gen=200, t_eval=7046.9ms
+37	24.141	7223	256	q8_0	q8_0	True	25	32	16	p12_iq2m_gpu25	ok	n_gpu=25, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=23.820tok/s internal=24.141tok/s, gen=200, t_eval=8243.1ms
+38	27.029	7475	256	q8_0	q8_0	True	26	32	16	p12_iq2m_gpu26	ok	n_gpu=26, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=26.683tok/s internal=27.029tok/s, gen=200, t_eval=7362.4ms
+39	28.844	7319	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t12	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=28.259tok/s internal=28.844tok/s, gen=200, t_eval=6899.1ms
+40	28.779	7319	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t13	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=28.203tok/s internal=28.779tok/s, gen=200, t_eval=6914.7ms
+41	29.124	7319	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t8	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=28.703tok/s internal=29.124tok/s, gen=200, t_eval=6832.8ms
+42	27.429	7319	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t6	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=27.053tok/s internal=27.429tok/s, gen=200, t_eval=7255.1ms
+43	27.812	7319	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t7	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=27.459tok/s internal=27.812tok/s, gen=200, t_eval=7155.3ms
+44	28.123	7319	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t8_r2	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=27.746tok/s internal=28.123tok/s, gen=200, t_eval=7076.2ms
+45	24.569	7319	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t8_gen300	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=24.239tok/s internal=24.569tok/s, gen=252, t_eval=10216.3ms
+46	20.495	7319	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t8_noopoff	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=20.136tok/s internal=20.495tok/s, gen=200, t_eval=9709.8ms
+47	27.270	7319	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t9	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=26.745tok/s internal=27.270tok/s, gen=200, t_eval=7297.3ms
+48	28.443	7319	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t10	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=27.958tok/s internal=28.443tok/s, gen=200, t_eval=6996.5ms
+49	27.769	7319	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t8_r49	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=27.364tok/s internal=27.769tok/s, gen=200, t_eval=7166.3ms
+50	29.266	7319	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t8_r50	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=28.872tok/s internal=29.266tok/s, gen=200, t_eval=6799.7ms
+51	28.764	7319	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t8_r51	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=28.335tok/s internal=28.764tok/s, gen=200, t_eval=6918.4ms
+52	27.512	7319	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t8_r52	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=27.129tok/s internal=27.512tok/s, gen=200, t_eval=7233.2ms
+53	28.968	7319	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t8_r53	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=28.557tok/s internal=28.968tok/s, gen=200, t_eval=6869.7ms
+54	28.113	7309	256	q8_0	q8_0	True	27	8	4	p12_iq2xxs_gpu27_t8_b8	ok	n_gpu=27, batch=8/4, q8_0 KV, n_ctx=256, flash=1 — wall=27.699tok/s internal=28.113tok/s, gen=200, t_eval=7078.5ms
+55	18.673	7283	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t8_nokqv	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=18.394tok/s internal=18.673tok/s, gen=200, t_eval=10656.8ms
+56	21.807	7319	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t8_mlock	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=21.358tok/s internal=21.807tok/s, gen=200, t_eval=9125.6ms
+57	18.431	7325	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t8_nommap	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=18.113tok/s internal=18.431tok/s, gen=200, t_eval=10797.1ms
+58	19.628	7319	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t8_tb4	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=19.289tok/s internal=19.628tok/s, gen=200, t_eval=10138.6ms
+59	27.740	7319	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t8_tb8	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=27.363tok/s internal=27.740tok/s, gen=200, t_eval=7173.9ms
+60	29.740	7319	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t8_final_r60	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=29.330tok/s internal=29.740tok/s, gen=200, t_eval=6691.3ms
+61	29.749	7319	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t8_final_r61	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=29.316tok/s internal=29.749tok/s, gen=200, t_eval=6689.4ms
+62	29.899	7319	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t8_final_r62	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=29.490tok/s internal=29.899tok/s, gen=200, t_eval=6655.7ms
+63	26.073	7546	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t8_final_r63	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=25.674tok/s internal=26.073tok/s, gen=200, t_eval=7632.5ms
+64	28.738	7546	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t8_final_r64	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=28.358tok/s internal=28.738tok/s, gen=200, t_eval=6924.5ms
+65	29.858	7546	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t8_push_65	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=29.443tok/s internal=29.858tok/s, gen=200, t_eval=6664.9ms
+66	29.747	7546	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t8_push_66	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=29.332tok/s internal=29.747tok/s, gen=200, t_eval=6689.8ms
+67	29.185	7546	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t8_push_67	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=28.773tok/s internal=29.185tok/s, gen=200, t_eval=6818.5ms
+68	29.252	7546	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t8_push_68	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=28.843tok/s internal=29.252tok/s, gen=200, t_eval=6803.0ms
+69	25.610	7546	256	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t8_push_69	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=25.118tok/s internal=25.610tok/s, gen=200, t_eval=7770.3ms
+70	28.945	7546	128	q8_0	q8_0	True	27	32	16	p12_iq2xxs_gpu27_t8_ctx128	ok	n_gpu=27, batch=32/16, q8_0 KV, n_ctx=128, flash=1 — wall=28.581tok/s internal=28.945tok/s, gen=100, t_eval=3420.3ms
+71	26.574	7302	256	q8_0	q8_0	True	26	32	16	p12_iq2xxs_gpu26_t8	ok	n_gpu=26, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=26.219tok/s internal=26.574tok/s, gen=200, t_eval=7488.5ms
+72	25.637	7702	256	q8_0	q8_0	True	26	32	16	p12_iq2m_gpu26_t8	ok	n_gpu=26, batch=32/16, q8_0 KV, n_ctx=256, flash=1 — wall=25.264tok/s internal=25.637tok/s, gen=200, t_eval=7762.3ms
