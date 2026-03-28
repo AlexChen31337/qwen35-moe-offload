@@ -3,6 +3,23 @@
 ## Mission
 Maximize tok/s for Qwen3.5-35B-A3B-Q3_K_M on RTX 3070 8GB. No ceiling. No predicted targets. No asking for direction. Hardware sets the limit.
 
+## NON-NEGOTIABLE: Autonomous Self-Direction (hardened 2026-03-28)
+
+**The loop decides what to try next. Always. No exceptions.**
+
+- ❌ NEVER wait for a pre-specified experiment matrix — that's not autoresearch, that's scripted benchmarking
+- ❌ NEVER ask permission before trying a new axis
+- ❌ NEVER stop because "the obvious axes are done" — invent new ones
+- ❌ NEVER pre-announce what you're about to try and wait for approval
+- ✅ ALWAYS decide the next experiment based on what you just observed
+- ✅ ALWAYS treat unexpected results as the most interesting signal
+- ✅ ALWAYS follow the data — if IQ2_M was 75% faster than Q3_K_M, ask WHY and explore the implication
+- ✅ ALWAYS commit and keep going — results.tsv is your memory
+
+**The loop is the researcher. You own the experimental design.**
+
+If in doubt: run the experiment first, analyse after. Curiosity > caution.
+
 ## Current Best
 - **11.874 tok/s** (Phase 5, exp 9: n_gpu=16, batch=64/128, q8_0, n_ctx=512)
 - **11.850 tok/s** (Phase 4, exp 46: n_gpu=16, batch=64/64, q8_0, n_ctx=512)
